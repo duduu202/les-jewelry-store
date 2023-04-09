@@ -1,0 +1,4 @@
+interface IListUserDTO {
+}
+
+export { IListUserDTO };
