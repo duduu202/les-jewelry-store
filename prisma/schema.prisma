@@ -8,15 +8,15 @@ generator client {
 datasource db {
   provider          = "postgresql"
   url               = env("DATABASE_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  //shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 model User {
   id       String   @id @default(uuid())
 
   address   Address?
-  coupon     Coupon?
-  order     Order?
+  //coupon     Coupon?
+  //order     Order?
 
   name     String
   CPF      String?
@@ -47,84 +47,84 @@ model Address {
   @@map("addresses")
 }
 
-model Product {
-  id              String         @id @default(uuid())
-  price           Float
-  stock           Int
-  name            String
-  description     String
-  order           Order?
-  created_at      DateTime       @default(now())
-  updated_at      DateTime       @updatedAt
+//model Product {
+//  id              String         @id @default(uuid())
+//  price           Float
+//  stock           Int
+//  name            String
+//  description     String
+//  order           Order?
+//  created_at      DateTime       @default(now())
+//  updated_at      DateTime       @updatedAt
+//
+//  @@map("products")
+//}
 
-  @@map("products")
-}
+//model Purchase {
+//  id              String         @id @default(uuid())
+//
+//  user_id    String?   @unique
+//  user       User?     @relation(fields: [user_id], references: [id])
+//
+//  product_id String?   @unique
+//  product    Product?  @relation(fields: [product_id], references: [id])
+//
+//  created_at      DateTime       @default(now())
+//  updated_at      DateTime       @updatedAt
+//
+//  @@map("purchases")
+//}
 
-model Purchase {
-  id              String         @id @default(uuid())
-
-  user_id    String?   @unique
-  user       User?     @relation(fields: [user_id], references: [id])
-
-  product_id String?   @unique
-  product    Product?  @relation(fields: [product_id], references: [id])
-
-  created_at      DateTime       @default(now())
-  updated_at      DateTime       @updatedAt
-
-  @@map("purchases")
-}
-
-model Order {
-  id              String         @id @default(uuid())
-
-  status_history  Status[]
-
-  user_id    String?   @unique
-  user       User?     @relation(fields: [user_id], references: [id])
-
-  product_id String?   @unique
-  product    Product?  @relation(fields: [product_id], references: [id])
-
-  created_at      DateTime       @default(now())
-  updated_at      DateTime       @updatedAt
-
-  @@map("orders")
-}
+//model Order {
+//  id              String         @id @default(uuid())
+//
+//  status_history  Status[]
+//
+//  user_id    String?   @unique
+//  user       User?     @relation(fields: [user_id], references: [id])
+//
+//  product_id String?   @unique
+//  product    Product?  @relation(fields: [product_id], references: [id])
+//
+//  created_at      DateTime       @default(now())
+//  updated_at      DateTime       @updatedAt
+//
+//  @@map("orders")
+//}
 
 
-model Status {
-  id              String         @id @default(uuid())
-  order_id    String?   @unique
-  order       Order?     @relation(fields: [order_id], references: [id])
+//model Status {
+//  id              String         @id @default(uuid())
+//  order_id    String?   @unique
+//  order       Order?     @relation(fields: [order_id], references: [id])
+//
+//  name          Status_type @default(Processing)
+//  created_at      DateTime       @default(now())
+//  updated_at      DateTime       @updatedAt
+//
+//  @@map("status")
+//}
 
-  name          Status_type @default(Processing)
-  created_at      DateTime       @default(now())
-  updated_at      DateTime       @updatedAt
-
-  @@map("status")
-}
-
-enum Status_type {
-  Processing
-  In_transit
-  Delivered
-}
-
-model Coupon {
-  id              String         @id @default(uuid())
-
-  user_id    String?   @unique
-  user       User?     @relation(fields: [user_id], references: [id])
-
-  code            String
-  discount        Float
-  available_until DateTime
-  created_at      DateTime       @default(now())
-  updated_at      DateTime       @updatedAt
-
-  @@map("coupons")
-}
+//enum Status_type {
+//  Processing
+//  In_transit
+//  Delivered
+//}
+//
+//model Coupon {
+//  id              String         @id @default(uuid())
+//
+//  user_id    String?   @unique
+//  user       User?     @relation(fields: [user_id], references: [id])
+//
+//  code            String
+//  discount        Float
+//  available_until DateTime
+//  created_at      DateTime       @default(now())
+//  updated_at      DateTime       @updatedAt
+//
+//  @@map("coupons")
+//}
 
 enum UserRole {
   Master
