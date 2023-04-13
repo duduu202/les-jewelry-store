@@ -5,7 +5,7 @@ export const createUserMiddleware = celebrate({
     name: Joi.string().required(),
     CPF: Joi.string().min(11).max(11),
     email: Joi.string().email().required(),
-    password: Joi.string().min(8),
+    password: Joi.string().min(8).required(),
   },
 });
 
