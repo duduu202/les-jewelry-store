@@ -5,6 +5,7 @@ interface IUpdateUserDTO {
   name: string;
   CPF?: string;
   email?: string;
+  phone?: string;
 }
 
 export { IUpdateUserDTO };

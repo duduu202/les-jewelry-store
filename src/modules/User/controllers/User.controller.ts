@@ -10,7 +10,7 @@ import { ListUserService } from '../services/ListUser.service';
 
 class UserController {
   async create(req: Request, res: Response): Promise<Response> {
-    const { name, email, password, CPF } = req.body;
+    const { name, email, password, CPF, phone } = req.body;
     // const avatar = req.file?.filename;
 
     const createUserService = container.resolve(CreateUserService);
@@ -20,6 +20,7 @@ class UserController {
       email,
       password,
       CPF,
+      phone,
     });
 
     return res.status(201).json(instanceToInstance(user));

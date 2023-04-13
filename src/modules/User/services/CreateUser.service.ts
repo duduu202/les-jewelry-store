@@ -32,6 +32,7 @@ class CreateUserService {
       email: userParams.email,
       name: userParams.name,
       password: hashed_password,
+      phone: userParams.phone,
     });
 
     return plainToInstance(User, user);

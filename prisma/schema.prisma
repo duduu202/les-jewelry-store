@@ -22,6 +22,7 @@ model User {
   CPF      String?
   email    String   @unique
   password String   @default("")
+  phone    String  @default("")
   role     UserRole @default(Client)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt

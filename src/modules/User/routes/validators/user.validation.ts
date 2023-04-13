@@ -6,6 +6,7 @@ export const createUserMiddleware = celebrate({
     CPF: Joi.string().min(11).max(11),
     email: Joi.string().email().required(),
     password: Joi.string().min(8).required(),
+    phone: Joi.string().min(10).max(13),
   },
 });
 
@@ -32,6 +33,7 @@ export const updateUserMiddleware = celebrate({
     CPF: Joi.string().min(11).max(11),
     email: Joi.string().email(),
     password: Joi.string().min(8),
+    phone: Joi.string().min(10).max(13),
   },
 });
 
