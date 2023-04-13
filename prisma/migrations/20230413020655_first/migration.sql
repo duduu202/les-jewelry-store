@@ -8,6 +8,7 @@ CREATE TABLE "users" (
     "CPF" TEXT,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL DEFAULT '',
+    "phone" TEXT NOT NULL DEFAULT '',
     "role" "UserRole" NOT NULL DEFAULT 'Client',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
