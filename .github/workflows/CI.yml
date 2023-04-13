@@ -61,5 +61,5 @@ jobs:
           script: |
             cd ~/apps/les-jewelry-store
             yarn
-            ./node_modules/.bin/prisma2 migrate dev
+            ./node_modules/.bin/prisma migrate dev
             pm2 restart les-jewelry-store
