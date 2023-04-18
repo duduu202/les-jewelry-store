@@ -14,7 +14,7 @@ datasource db {
 model User {
   id       String   @id @default(uuid())
 
-  address   Address?
+  address   Address[]
   //coupon     Coupon?
   //order     Order?
 
@@ -24,6 +24,7 @@ model User {
   password String   @default("")
   phone    String  @default("")
   role     UserRole @default(Client)
+
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
@@ -33,7 +34,7 @@ model User {
 model Address {
   id         String   @id @default(uuid())
 
-  user_id    String   @unique
+  user_id    String
   user       User     @relation(fields: [user_id], references: [id])
 
   street     String
@@ -42,6 +43,7 @@ model Address {
   city       String
   state      String
   zip_code   String
+  
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
