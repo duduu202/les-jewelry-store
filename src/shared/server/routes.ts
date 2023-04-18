@@ -2,11 +2,13 @@ import { Router, Request, Response, NextFunction } from 'express';
 
 import { userRouter } from '@modules/User/routes/user.routes';
 import { addressRouter } from '@modules/Address/routes/address.routes';
+import { productRouter } from '@modules/Product/routes/product.routes';
 
 const router = Router();
 
 router.use('/user', userRouter);
 router.use('/address', addressRouter);
+router.use('/product', productRouter);
 // router.use('/project', projectRouter);
 
 router.get('/', (request: Request, response: Response) =>

@@ -23,7 +23,7 @@ model User {
   email    String   @unique
   password String   @default("")
   phone    String  @default("")
-  role     UserRole @default(Client)
+  role     UserRole @default(Customer)
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -50,18 +50,19 @@ model Address {
   @@map("addresses")
 }
 
-//model Product {
-//  id              String         @id @default(uuid())
-//  price           Float
-//  stock           Int
-//  name            String
-//  description     String
-//  order           Order?
-//  created_at      DateTime       @default(now())
-//  updated_at      DateTime       @updatedAt
-//
-//  @@map("products")
-//}
+model Product {
+  id              String         @id @default(uuid())
+
+  price           Float
+  stock           Int
+  name            String
+  description     String
+
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @updatedAt
+
+  @@map("products")
+}
 
 //model Purchase {
 //  id              String         @id @default(uuid())
@@ -131,7 +132,7 @@ model Address {
 
 enum UserRole {
   Master
-  Client
+  Customer
 }
 
 
