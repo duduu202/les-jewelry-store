@@ -46,12 +46,10 @@ class AddressController {
 
     const listAddressService = container.resolve(ListAddressService);
 
-    const include = 'company';
-
     const Addresss = await listAddressService.execute({
-      // filters: {
-      //  company_client_id: req.Address.company_id,
-      // },
+      filters: {
+        user_id: req.user.id,
+      },
       limit: limit ? Number(limit) : undefined,
       page: page ? Number(page) : undefined,
       // include: include ? { [String(include)]: true } : undefined,
