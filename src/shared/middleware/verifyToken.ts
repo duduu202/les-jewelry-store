@@ -9,8 +9,7 @@ interface ITokenPayload {
   exp: number;
   sub: string;
   isMaster: boolean;
-  permissions: string[];
-  company_id?: string;
+  role: string;
 }
 
 function verifyToken(
@@ -29,20 +28,18 @@ function verifyToken(
   try {
     const decoded = verify(token, jwt_config.secret as string);
 
-    const { sub, isMaster, permissions, company_id } = decoded as ITokenPayload;
+    const { sub, isMaster, role } = decoded as ITokenPayload;
 
     console.log('request user:');
     console.log({
       id: sub,
       isMaster,
-      permissions,
-      company_id,
+      role,
     });
     request.user = {
       id: sub,
       isMaster,
-      permissions,
-      company_id,
+      role,
     };
 
     return next();
