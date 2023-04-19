@@ -45,8 +45,9 @@ class ProductController {
     const listProductService = container.resolve(ListProductService);
 
     const Products = await listProductService.execute({
-      //filters: {
-      //},
+      filters: {
+        name: name ? String(name) : undefined,
+      },
       limit: limit ? Number(limit) : undefined,
       page: page ? Number(page) : undefined,
       // include: include ? { [String(include)]: true } : undefined,
