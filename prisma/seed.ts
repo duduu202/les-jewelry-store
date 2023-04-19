@@ -45,6 +45,7 @@ const main = async () => {
   }
 
   console.log({ master });
+  prisma.$connect();
 };
 
 main()
