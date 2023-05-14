@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { verifyToken } from '@shared/middleware/verifyToken';
-import { AddressController } from '../controllers/Addres.controller';
+import { AddressController } from '../controllers/Address.controller';
 import { 
   createAddressMiddleware,
   deleteAddressMiddleware,

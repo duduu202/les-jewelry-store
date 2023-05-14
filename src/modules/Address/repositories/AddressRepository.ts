@@ -11,7 +11,7 @@ class AddressRepository implements IAddressRepository {
     filter: Partial<Address>,
     //include?: { [key: string]: boolean },
   ): Promise<EntityAddress | null> {
-    const address = await prisma.address.findFirstOrThrow({
+    const address = await prisma.address.findFirst({
       where: { ...filter },
     });
 

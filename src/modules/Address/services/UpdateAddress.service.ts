@@ -23,7 +23,7 @@ class UpdateAddressService {
       user_id: request_id,
     });
 
-    if (!address) throw new AppError('Usuário não encontrado', 404);
+    if (!address) throw new AppError('Endereço não encontrado', 404);
 
     Object.assign(address, addressParams);
 

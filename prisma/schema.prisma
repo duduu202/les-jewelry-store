@@ -6,15 +6,16 @@ generator client {
 }
 
 datasource db {
-  provider          = "postgresql"
-  url               = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
   //shadowDatabaseUrl = env("DATABASE_URL")
 }
 
 model User {
-  id       String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  address   Address[]
+  payment_card PaymentCard[]
+  address      Address[]
   //coupon     Coupon?
   //order     Order?
 
@@ -22,28 +23,30 @@ model User {
   CPF      String?
   email    String   @unique
   password String   @default("")
-  phone    String  @default("")
+  phone    String   @default("")
   role     UserRole @default(Customer)
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+  coupons     Coupon[]
 
   @@map("users")
 }
 
 model Address {
-  id         String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  user_id    String
-  user       User     @relation(fields: [user_id], references: [id])
+  user_id String
+  user    User   @relation(fields: [user_id], references: [id])
+  cart    Cart[]
 
-  street     String
-  number     String
-  district   String
-  city       String
-  state      String
-  zip_code   String
-  
+  street   String
+  number   String
+  district String
+  city     String
+  state    String
+  zip_code String
+
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
@@ -51,18 +54,137 @@ model Address {
 }
 
 model Product {
-  id              String         @id @default(uuid())
+  id String @id @default(uuid())
 
-  price           Float
-  stock           Int
-  name            String
-  description     String
-  image           String?
+  price       Float
+  stock       Int
+  name        String
+  description String
+  image       String?
 
-  created_at      DateTime       @default(now())
-  updated_at      DateTime       @updatedAt
+  cart_items CartItems[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   @@map("products")
+}
+
+// many products to many carts
+model CartItems {
+  id String @id @default(uuid())
+
+  cart_id String
+  cart    Cart   @relation(fields: [cart_id], references: [id])
+
+  product_id String
+  product    Product @relation(fields: [product_id], references: [id])
+
+  quantity   Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@unique([cart_id, product_id])
+  @@map("cart_items")
+}
+
+// many PaymentCard to many Carts
+model CartPaymentCard {
+  id String @id @default(uuid())
+
+  cart_id String? @unique
+  cart    Cart?   @relation(fields: [cart_id], references: [id])
+
+  payment_card_id String?
+  payment_card    PaymentCard? @relation(fields: [payment_card_id], references: [id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@unique([cart_id, payment_card_id])
+  @@map("cart_payment_cards")
+}
+
+model Cart {
+  id String @id @default(uuid())
+  user_id    String
+
+  // many to many
+  cart_items CartItems[]
+  cart_payment_cards CartPaymentCard[]
+
+  cupom_id String?
+  status      Cart_status @default(EM_PROCESSAMENTO)
+  paid_status Paid_status @default(NOT_PAID)
+  address_id   String?
+  address      Address?       @relation(fields: [address_id], references: [id])
+
+  expires_at      DateTime
+  created_at      DateTime         @default(now())
+  updated_at      DateTime         @updatedAt
+
+  @@map("carts")
+}
+
+enum Paid_status {
+  PAID
+  NOT_PAID
+  REFUNDED
+  EXPIRED
+}
+
+enum Cart_status {
+  EM_PROCESSAMENTO
+  EM_TRANSITO
+  ENTREGUE
+  EM_TROCA
+  TROCA_AUTORIZADA
+  REPROVADA
+  APROVADA
+}
+
+model Coupon {
+  id String @id @default(uuid())
+
+  user_id String? @unique
+  user    User?   @relation(fields: [user_id], references: [id])
+
+  type Coupon_type @default(discount)
+
+  code            String
+  quantity        Int @default(1)
+  discount        Float
+  expires_at      DateTime
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  @@map("coupons")
+}
+
+model PaymentCard {
+  id String @id @default(uuid())
+
+  user_id String
+  user    User   @relation(fields: [user_id], references: [id])
+
+  // the card id in the payment gateway
+  external_id String
+
+  first_four_digits String
+  last_four_digits  String
+  brand             String
+  holder_name       String
+
+  created_at      DateTime          @default(now())
+  updated_at      DateTime          @updatedAt
+  cart_payment_cards CartPaymentCard[]
+
+  @@map("payment_cards")
+}
+
+enum Coupon_type {
+  exchange
+  discount
 }
 
 //model Purchase {
@@ -96,7 +218,6 @@ model Product {
 //
 //  @@map("orders")
 //}
-
 
 //model Status {
 //  id              String         @id @default(uuid())
@@ -135,5 +256,3 @@ enum UserRole {
   Master
   Customer
 }
-
-

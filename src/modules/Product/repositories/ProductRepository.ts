@@ -1,4 +1,4 @@
-import { Product } from '@prisma/client';
+import { Product, Paid_status } from '@prisma/client';
 import { prisma } from '@shared/database';
 import { IPaginatedRequest } from '@shared/interfaces/IPaginatedRequest';
 import { IPaginatedResponse } from '@shared/interfaces/IPaginatedResponse';
@@ -11,8 +11,31 @@ class ProductRepository implements IProductRepository {
     filter: Partial<Product>,
     //include?: { [key: string]: boolean },
   ): Promise<EntityProduct | null> {
-    const product = await prisma.product.findFirstOrThrow({
+    const product = await prisma.product.findFirst({
       where: { ...filter },
+    });
+    if(!product) return null;
+
+    const notPaidCount = await prisma.cart.count({
+      where: {
+        cart_items: {
+          some: {
+            product_id: product.id,
+            cart: {
+              paid_status: {
+                // not paid and not EXPIRED
+                // not: 'PAID', and not: 'EXPIRED'
+                notIn: ['PAID', 'EXPIRED'],
+
+              },
+            },
+          },
+        },
+      },
+    });
+
+    Object.assign(product, {
+      stock_available: product.stock - notPaidCount,
     });
 
     return product as EntityProduct;
@@ -46,8 +69,35 @@ class ProductRepository implements IProductRepository {
       },
     });
 
+
+    // stock means the total of products in stock
+    // stock_available means the total of products in stock that are available to sell, not reserved
+    // because a cart can reserve a product, but the product is still in stock
+    const productsWithStock = await Promise.all(products.map(async (product) => {
+      const notPaidCount = await prisma.cart.count({
+        where: {
+          cart_items: {
+            some: {
+              product_id: product.id,
+              cart: {
+                paid_status: {
+                  not: 'PAID',
+                },
+              },
+            },
+          },
+        },
+      });
+    
+      return {
+        ...product,
+        stock: product.stock,
+        stock_available: product.stock - notPaidCount,
+      };
+    }));
+    
     return {
-      results: products as EntityProduct[],
+      results: productsWithStock as EntityProduct[],
       total: productTotal,
       page,
       limit,
@@ -68,7 +118,6 @@ class ProductRepository implements IProductRepository {
     const updatedProduct = await prisma.product.update({
       where: { id },
       data: {
-        ...datas,
       },
     });
 
