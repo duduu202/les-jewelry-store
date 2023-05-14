@@ -38,6 +38,7 @@ userRouter.use('/session', sessionRouter);
 // );
 
 // userRouter.use(verifyToken);
+userRouter.use(verifyToken);
 
 userRouter.put('/:user_id', updateUserMiddleware, userController.update);
 
