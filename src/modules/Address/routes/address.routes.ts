@@ -5,6 +5,7 @@ import {
   createAddressMiddleware,
   deleteAddressMiddleware,
   listAddressMiddleware,
+  showAddressMiddleware,
   updateAddressMiddleware
 } from './validators/address.validation';
 
@@ -15,6 +16,7 @@ addressRouter.use(verifyToken);
 
 addressRouter.post('/', createAddressMiddleware, addressController.create);
 addressRouter.get('/', listAddressMiddleware, addressController.index);
+addressRouter.get('/:id', showAddressMiddleware, addressController.show);
 addressRouter.delete('/:id', deleteAddressMiddleware, addressController.delete);
 addressRouter.put('/:id', updateAddressMiddleware, addressController.update);
 

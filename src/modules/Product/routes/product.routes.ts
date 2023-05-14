@@ -5,6 +5,7 @@ import {
   createProductMiddleware,
   deleteProductMiddleware,
   listProductMiddleware,
+  showProductMiddleware,
   updateProductMiddleware
 } from './validators/product.validation';
 import { ProductController } from '../controllers/Product.controller';
@@ -18,6 +19,7 @@ productRouter.use(verifyToken);
 
 productRouter.use(verifyAuthorization([UserRole.Customer, UserRole.Master]));
 productRouter.get('/', listProductMiddleware, productController.index);
+productRouter.get('/:id', showProductMiddleware, productController.show);
 
 productRouter.use(verifyAuthorization([UserRole.Master]));
 productRouter.post('/', uploadMulter.single('image'), createProductMiddleware, productController.create);
