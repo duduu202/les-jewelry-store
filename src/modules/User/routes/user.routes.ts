@@ -38,6 +38,7 @@ userRouter.use('/session', sessionRouter);
 // );
 
 // userRouter.use(verifyToken);
+userRouter.post('/', createUserMiddleware, userController.create);
 userRouter.use(verifyToken);
 
 userRouter.put('/:user_id', updateUserMiddleware, userController.update);
@@ -48,6 +49,6 @@ userRouter.get('/', listUserMiddleware, userController.index);
 
 userRouter.get('/:user_id', showUserMiddleware, userController.show);
 
-userRouter.post('/', createUserMiddleware, userController.create);
+
 
 export { userRouter };
