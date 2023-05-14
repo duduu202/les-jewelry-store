@@ -24,6 +24,9 @@ class DiskStorageProvider implements IStorageProvider {
         path.resolve(uploadConfig.uploadsFolder, file),
       );
     } catch (err) {
+      console.log("disk error log: ");
+      console.log(err);
+      console.dir(err, { depth: 5 });
       throw new AppError(`Erro ao realizar upload`);
     }
 

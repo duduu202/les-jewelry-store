@@ -47,6 +47,9 @@ class S3StorageProvider implements IStorageProvider {
         })
         .promise();
     } catch (err) {
+      console.log("S3 error log: ");
+      console.log(err);
+      console.dir(err, { depth: 5 });
       throw new AppError(`Erro ao realizar upload`);
     }
 
