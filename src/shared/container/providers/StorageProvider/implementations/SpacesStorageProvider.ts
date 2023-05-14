@@ -58,6 +58,7 @@ class SpacesStorageProvider implements IStorageProvider {
         })
         .promise();
     } catch (err) {
+      console.dir(err, { depth: 5 });
       throw new AppError(`Erro ao realizar upload`);
     }
 

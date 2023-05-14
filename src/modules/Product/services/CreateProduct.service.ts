@@ -22,9 +22,12 @@ class CreateProductService {
   ) {}
 
   public async execute({ image, description, ...productParams }: ICreateProductDTO): Promise<Product> {
-
-    const filename: undefined | string = image ? await this.storageProvider.saveFile(image) : undefined;
-    const urlImage = process.env.API_URL + '/files/' + filename;
+    let urlImage: string | undefined = undefined;
+    if(image){
+      const filename = await this.storageProvider.saveFile(image);
+      urlImage = process.env.API_URL + '/files/' + filename;
+    }
+    
 
     const product = await this.productRepository.create({
       description: description || '',
