@@ -1,3 +1,4 @@
+import { AppError } from '@shared/error/AppError';
 import { instanceToInstance } from 'class-transformer';
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
@@ -12,18 +13,23 @@ import { UpdateProductService } from '../services/UpdateProduct.service';
 class ProductController {
   async create(req: Request, res: Response): Promise<Response> {
     const { price, stock, name, description } = req.body;
+    //if (!req.file) {
+    //  throw new AppError('Nenhum arquivo enviado', 400);
+    //}
 
     const createProductService = container.resolve(CreateProductService);
-
+    
     const Product = await createProductService.execute({
       price,
       stock,
       name,
       description,
+      image: req.file?.filename,
     });
 
     return res.status(201).json(instanceToInstance(Product));
   }
+
 
   async show(req: Request, res: Response): Promise<Response> {
     const { id } = req.params;

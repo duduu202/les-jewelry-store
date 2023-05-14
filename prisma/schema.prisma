@@ -57,6 +57,7 @@ model Product {
   stock           Int
   name            String
   description     String
+  image           String?
 
   created_at      DateTime       @default(now())
   updated_at      DateTime       @updatedAt

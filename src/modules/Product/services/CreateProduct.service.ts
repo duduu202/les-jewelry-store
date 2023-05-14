@@ -6,6 +6,7 @@ import { plainToInstance } from 'class-transformer';
 import { IProductRepository } from '../repositories/ProductRepository.interface';
 import { ICreateProductDTO } from './dto/CreateProductDTO';
 import { Product } from '../entities/Product';
+import { IStorageProvider } from '@shared/container/providers/StorageProvider/models/IStorageProvider';
 
 @injectable()
 class CreateProductService {
@@ -15,11 +16,19 @@ class CreateProductService {
 
     @inject('HashProvider')
     private hashProvider: IHashProvider,
+
+    @inject('StorageProvider')
+    private storageProvider: IStorageProvider,
   ) {}
 
-  public async execute({ description, ...productParams }: ICreateProductDTO): Promise<Product> {
+  public async execute({ image, description, ...productParams }: ICreateProductDTO): Promise<Product> {
+
+    const filename: undefined | string = image ? await this.storageProvider.saveFile(image) : undefined;
+    const urlImage = process.env.API_URL + '/files/' + filename;
+
     const product = await this.productRepository.create({
       description: description || '',
+      image: urlImage,
       ...productParams,
     });
 
