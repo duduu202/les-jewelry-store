@@ -118,6 +118,7 @@ class ProductRepository implements IProductRepository {
     const updatedProduct = await prisma.product.update({
       where: { id },
       data: {
+        ...datas,
       },
     });
 
