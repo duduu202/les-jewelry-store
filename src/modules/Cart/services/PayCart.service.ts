@@ -86,6 +86,12 @@ class PayCartService {
       cart.paid_status = Paid_status.EXPIRED;
       throw new AppError('Carrinho expirado', 400);
     }
+    if(cart.paid_status == Paid_status.PAID){
+      throw new AppError('Carrinho já pago', 400);
+    }
+    if(cart.paid_status == Paid_status.REFUNDED){
+      throw new AppError('Carrinho reembolsado', 400);
+    }
   }
 
   private async checkCupom(coupon_code: string, user_id: string): Promise<Coupon> {
