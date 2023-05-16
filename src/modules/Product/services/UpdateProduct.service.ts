@@ -26,7 +26,16 @@ class UpdateProductService {
 
     Object.assign(product, productParams);
 
-    const newProduct = await this.productRepository.update(product);
+    const newProduct = await this.productRepository.update({
+      created_at: product.created_at,
+      updated_at: product.updated_at,
+      description: product.description,
+      id: product.id,
+      image: product.image,
+      name: product.name,
+      price: product.price,
+      stock: product.stock,
+    });
 
     return plainToInstance(Product, newProduct);
   }
