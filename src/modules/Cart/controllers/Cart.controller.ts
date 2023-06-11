@@ -7,8 +7,7 @@ import { ListCartService } from '../services/ListCart.service';
 import { PayCartService } from '../services/PayCart.service';
 import { ShowCartService } from '../services/ShowCart.service';
 import { UpdateCartService } from '../services/UpdateCart.service';
-
-
+import { PatchCartService } from '../services/PatchCart.service';
 
 class CartController {
   async create(req: Request, res: Response): Promise<Response> {
@@ -36,7 +35,7 @@ class CartController {
       payment_cards,
       request_id: user.id,
       coupon_code,
-      address_id
+      address_id,
     });
 
     return res.json(Cart);
@@ -100,6 +99,20 @@ class CartController {
     });
 
     return res.status(204).send();
+  }
+
+  async patch(req: Request, res: Response): Promise<Response> {
+    const { id } = req.params;
+    const { user } = req;
+
+    const patchCartService = container.resolve(PatchCartService);
+
+    const Cart = await patchCartService.execute({
+      id,
+      request_id: user.id,
+    });
+
+    return res.json(Cart);
   }
 }
 
