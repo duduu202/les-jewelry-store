@@ -1,3 +1,4 @@
+import { Cart_status } from '@prisma/client';
 import { celebrate, Joi, Segments } from 'celebrate';
 
 export const createCartMiddleware = celebrate({
@@ -39,6 +40,7 @@ export const listCartMiddleware = celebrate({
     page: Joi.number().min(1),
     limit: Joi.number().min(1).max(50),
     name: Joi.string(),
+    status: Joi.string().valid(...Object.values(Cart_status)),
   },
 });
 

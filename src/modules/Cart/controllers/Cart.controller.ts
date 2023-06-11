@@ -1,6 +1,7 @@
 import { instanceToInstance } from 'class-transformer';
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
+import { UserRole } from '@prisma/client';
 import { CreateCartService } from '../services/CreateCart.service';
 import { DeleteCartService } from '../services/DeleteCart.service';
 import { ListCartService } from '../services/ListCart.service';
@@ -56,13 +57,14 @@ class CartController {
   }
 
   async index(req: Request, res: Response): Promise<Response> {
-    const { page, limit, name } = req.query;
+    const { page, limit, name, status } = req.query;
 
     const listCartService = container.resolve(ListCartService);
 
     const Carts = await listCartService.execute({
       filters: {
-        user_id: req.user.id,
+        user_id: req.user.role === UserRole.Master ? undefined : req.user.id,
+        status,
       },
       limit: limit ? Number(limit) : undefined,
       page: page ? Number(page) : undefined,
