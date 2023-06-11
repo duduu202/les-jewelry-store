@@ -16,11 +16,9 @@ const productRouter = Router();
 const productController = new ProductController();
 
 productRouter.get('/', listProductMiddleware, productController.index);
+productRouter.get('/:id', showProductMiddleware, productController.show);
 
 productRouter.use(verifyToken);
-
-productRouter.use(verifyAuthorization([UserRole.Customer, UserRole.Master]));
-productRouter.get('/:id', showProductMiddleware, productController.show);
 
 productRouter.use(verifyAuthorization([UserRole.Master]));
 productRouter.post(
