@@ -9,6 +9,7 @@ import {
   payCartMiddleware,
   showCartMiddleware,
   updateCartMiddleware,
+  refundCartMiddleware,
 } from './validators/cart.validation';
 
 const cartRouter = Router();
@@ -18,6 +19,7 @@ cartRouter.use(verifyToken);
 
 cartRouter.post('/', createCartMiddleware, cartController.create);
 cartRouter.post('/pay/:id', payCartMiddleware, cartController.pay);
+cartRouter.post('/refund/:id', refundCartMiddleware, cartController.refund);
 cartRouter.get('/', listCartMiddleware, cartController.index);
 cartRouter.get('/:id', showCartMiddleware, cartController.show);
 cartRouter.delete('/:id', deleteCartMiddleware, cartController.delete);

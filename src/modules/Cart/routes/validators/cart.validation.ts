@@ -79,3 +79,20 @@ export const PatchCartMiddleware = celebrate({
     id: Joi.string(),
   },
 });
+
+export const refundCartMiddleware = celebrate({
+  [Segments.PARAMS]: {
+    id: Joi.string(),
+  },
+  [Segments.BODY]: {
+    items: Joi.array()
+      .items(
+        Joi.object({
+          product_id: Joi.string().uuid().required(),
+          quantity: Joi.number().min(1).required(),
+        }),
+      )
+      .min(1)
+      .required(),
+  },
+});

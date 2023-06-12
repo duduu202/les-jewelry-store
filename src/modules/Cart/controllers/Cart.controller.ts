@@ -9,6 +9,7 @@ import { PayCartService } from '../services/PayCart.service';
 import { ShowCartService } from '../services/ShowCart.service';
 import { UpdateCartService } from '../services/UpdateCart.service';
 import { PatchCartService } from '../services/PatchCart.service';
+import { CreateExchangeItemsService } from '../services/CreateExchangeItems.service';
 
 class CartController {
   async create(req: Request, res: Response): Promise<Response> {
@@ -115,6 +116,22 @@ class CartController {
     });
 
     return res.json(Cart);
+  }
+
+  async refund(req: Request, res: Response): Promise<Response> {
+    const { id } = req.params;
+    const { items } = req.body;
+    const createExchangeItemsService = container.resolve(
+      CreateExchangeItemsService,
+    );
+
+    const cart = await createExchangeItemsService.execute({
+      cart_id: id,
+      cart_items: items,
+      request_id: req.user.id,
+    });
+
+    return res.json(cart);
   }
 }
 
