@@ -5,7 +5,7 @@ import { Cart_items } from './Cart_items';
 
 class Cart implements ICart {
   address_id: string | null;
-  expires_at: Date;
+  expires_at: Date | null;
   cupom_id: string | null;
   paid_status: Paid_status;
   id: string;

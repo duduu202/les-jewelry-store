@@ -59,7 +59,6 @@ class CreateExchangeItemsService {
 
     const exchangeCart = await this.cartRepository.create({
       user_id: request_id,
-      expires_at: new Date(Date.now() + this.time_available_in_minutes * 60000),
       cart_items: exchangedItems.map(item => ({
         product_id: item.product.id,
         quantity: item.quantity,
@@ -71,7 +70,7 @@ class CreateExchangeItemsService {
     await this.cartRepository.update({
       id: cart_id,
       address_id: cart.address_id,
-      expires_at: new Date(cart.expires_at),
+      expires_at: cart.expires_at ? new Date(cart.expires_at) : null,
       cart_payment_cards: cart.cart_payment_cards,
       paid_status: cart.paid_status,
       status: cart.status,
