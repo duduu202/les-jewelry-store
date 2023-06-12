@@ -17,9 +17,8 @@ class CreateCartService {
 
     @inject('ProductRepository')
     private productRepository: IProductRepository,
-
-    //time_available_in_minutes = 30,
-  ) {
+  ) //time_available_in_minutes = 30,
+  {
     //this.time_available_in_minutes = time_available_in_minutes;
   }
 
@@ -27,22 +26,24 @@ class CreateCartService {
     console.log(cartParams.request_id);
     const { cupom_code, cart_items } = cartParams;
 
-    if(cart_items.length === 0) throw new AppError('Carrinho vazio', 400);
+    if (cart_items.length === 0) throw new AppError('Carrinho vazio', 400);
 
     const items = await Promise.all(
-      cart_items.map(async (item) => {
+      cart_items.map(async item => {
         const product = await this.productRepository.findBy({
           id: item.product_id,
         });
-        if(!product) throw new AppError('Produto não encontrado', 404);
-        if(product.stock_available < item.quantity) throw new AppError('Quantidade indisponível', 400);
+        if (!product)
+          throw new AppError('Produto não encontrado ' + item.product_id, 404);
+        if (product.stock_available < item.quantity)
+          throw new AppError('Quantidade indisponível', 400);
         return { product, quantity: item.quantity };
       }),
     );
 
     const cart = await this.cartRepository.create({
       user_id: cartParams.request_id,
-      cart_items: items.map((item) => ({
+      cart_items: items.map(item => ({
         product_id: item.product.id,
         quantity: item.quantity,
       })),

@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { verifyToken } from '@shared/middleware/verifyToken';
 import { CartController } from '../controllers/Cart.controller';
 import {
-  PatchCartMiddleware,
+  patchCartMiddleware,
   createCartMiddleware,
   deleteCartMiddleware,
   listCartMiddleware,
@@ -24,6 +24,6 @@ cartRouter.get('/', listCartMiddleware, cartController.index);
 cartRouter.get('/:id', showCartMiddleware, cartController.show);
 cartRouter.delete('/:id', deleteCartMiddleware, cartController.delete);
 cartRouter.put('/:id', updateCartMiddleware, cartController.update);
-cartRouter.patch('/:id', PatchCartMiddleware, cartController.patch);
+cartRouter.patch('/:id', patchCartMiddleware, cartController.patch);
 
 export { cartRouter };

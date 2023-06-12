@@ -13,7 +13,7 @@ interface ICartRepository {
     filter: IPaginatedRequest<Cart>,
   ): Promise<IPaginatedResponse<EntityCart>>;
   create(cart: ICartCreate): Promise<Cart>;
-  update(cart: EntityCart): Promise<Cart>;
+  update(cart: EntityCart): Promise<EntityCart>;
   remove(cart: Cart): Promise<void>;
 }
 

@@ -74,9 +74,12 @@ export const deleteCartMiddleware = celebrate({
   },
 });
 
-export const PatchCartMiddleware = celebrate({
+export const patchCartMiddleware = celebrate({
   [Segments.PARAMS]: {
     id: Joi.string(),
+  },
+  [Segments.BODY]: {
+    status: Joi.string().valid(...Object.values(Cart_status)),
   },
 });
 

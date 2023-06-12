@@ -5,6 +5,7 @@ import { addressRouter } from '@modules/Address/routes/address.routes';
 import { productRouter } from '@modules/Product/routes/product.routes';
 import { cartRouter } from '@modules/Cart/routes/cart.routes';
 import { paymentCardRouter } from '@modules/PaymentCard/routes/paymentCard.routes';
+import { couponRouter } from '@modules/Coupon/routes/coupon.routes';
 
 const router = Router();
 
@@ -13,6 +14,7 @@ router.use('/address', addressRouter);
 router.use('/product', productRouter);
 router.use('/cart', cartRouter);
 router.use('/payment_card', paymentCardRouter);
+router.use('/coupon', couponRouter);
 
 router.get('/', (request: Request, response: Response) =>
   response.send('jewelry store - 0.0.1'),

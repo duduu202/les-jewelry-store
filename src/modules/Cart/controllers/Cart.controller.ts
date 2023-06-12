@@ -106,6 +106,7 @@ class CartController {
 
   async patch(req: Request, res: Response): Promise<Response> {
     const { id } = req.params;
+    const { status } = req.body;
     const { user } = req;
 
     const patchCartService = container.resolve(PatchCartService);
@@ -113,6 +114,7 @@ class CartController {
     const Cart = await patchCartService.execute({
       id,
       request_id: user.id,
+      status,
     });
 
     return res.json(Cart);
