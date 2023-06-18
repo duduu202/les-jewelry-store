@@ -1,10 +1,11 @@
-import { Cart } from '@prisma/client';
+import { Cart, Cart_status } from '@prisma/client';
 import { prisma } from '@shared/database';
 import { IPaginatedRequest } from '@shared/interfaces/IPaginatedRequest';
 import { IPaginatedResponse } from '@shared/interfaces/IPaginatedResponse';
-import { ICartCreate } from './dto/CartRepositoryDTO';
+import { ICartCreate, ICartUpdate } from './dto/CartRepositoryDTO';
 import { ICartRepository } from './CartRepository.interface';
 import { Cart as EntityCart } from '../entities/Cart';
+import { getDeliveryFee, getTotalDiscount, sumTotalPrice } from '../util/CartValues';
 
 class CartRepository implements ICartRepository {
   async findBy(
@@ -14,13 +15,15 @@ class CartRepository implements ICartRepository {
     const cart = await prisma.cart.findFirst({
       where: { ...filter },
       include: {
+        cupom: true,
         cart_items: {
           include: {
             product: true,
-          }
+          },
         },
       },
     });
+    if (!cart) return null;
 
     return cart as EntityCart;
   }
@@ -29,9 +32,9 @@ class CartRepository implements ICartRepository {
     page = 1,
     limit = 10,
     filters,
-    //search,
-  }: IPaginatedRequest<Cart>): Promise<IPaginatedResponse<EntityCart>> {
-    const cartes = await prisma.cart.findMany({
+  }: //search,
+  IPaginatedRequest<Cart>): Promise<IPaginatedResponse<EntityCart>> {
+    const carts = await prisma.cart.findMany({
       where: filters && {
         ...filters,
         //name: {
@@ -40,10 +43,11 @@ class CartRepository implements ICartRepository {
         //},
       },
       include: {
+        cupom: true,
         cart_items: {
           include: {
             product: true,
-          }
+          },
         },
       },
       skip: (page - 1) * limit,
@@ -60,8 +64,17 @@ class CartRepository implements ICartRepository {
       },
     });
 
+    const cartsEntity = carts.map(cart => {
+      return {
+        ...cart,
+        products_price: sumTotalPrice(cart as EntityCart),
+        discount: getTotalDiscount(cart as EntityCart),
+        total_price: sumTotalPrice(cart as EntityCart, true, true),
+      };
+    }) as EntityCart[];
+
     return {
-      results: cartes as EntityCart[],
+      results: cartsEntity as EntityCart[],
       total: cartTotal,
       page,
       limit,
@@ -69,26 +82,36 @@ class CartRepository implements ICartRepository {
   }
 
   async create({ cart_items, ...datas }: ICartCreate): Promise<Cart> {
+    const cart_items_data = cart_items.map(item => {
+      return {
+        product_id: item.product.id,
+        quantity: item.quantity,
+      };
+    });
+
+    const delivery_fee = getDeliveryFee(cart_items, datas.status);
     const cart = await prisma.cart.create({
       data: {
         ...datas,
         cart_items: {
-          create: cart_items,
-        }
+          create: cart_items_data,
+        },
+        delivery_fee: delivery_fee,
       },
     });
+
     return cart;
   }
 
-  async update({ id, ...datas }: EntityCart): Promise<Cart> {
-    const cart_items = datas.cart_items.map((item) => {
+  async update({ id, ...datas }: ICartUpdate): Promise<EntityCart> {
+    const cart_items = datas.cart_items.map(item => {
       return {
         id: item.id,
         product_id: item.product_id,
         quantity: item.quantity,
-      }
+      };
     });
-    
+
     await prisma.cartPaymentCard.deleteMany({
       where: {
         cart_id: id,
@@ -100,9 +123,11 @@ class CartRepository implements ICartRepository {
       },
     });
 
+    const delivery_fee = getDeliveryFee(datas.cart_items, datas.status);
     const updatedCart = await prisma.cart.update({
       where: { id },
       data: {
+        delivery_fee: delivery_fee,
         paid_status: datas.paid_status,
         address_id: datas.address_id,
         created_at: datas.created_at,
@@ -114,12 +139,13 @@ class CartRepository implements ICartRepository {
           create: datas.cart_payment_cards,
         },
         cart_items: {
-          create: cart_items
+          create: cart_items,
         },
       },
     });
+    console.log('updatedCart', updatedCart);
 
-    return updatedCart;
+    return updatedCart as EntityCart;
   }
 
   async remove(cart: Cart): Promise<void> {

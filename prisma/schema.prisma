@@ -28,7 +28,7 @@ model User {
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  coupons     Coupon[]
+  coupons    Coupon[]
 
   @@map("users")
 }
@@ -106,22 +106,24 @@ model CartPaymentCard {
 }
 
 model Cart {
-  id String @id @default(uuid())
-  user_id    String
+  id      String @id @default(uuid())
+  user_id String
 
   // many to many
-  cart_items CartItems[]
+  cart_items         CartItems[]
   cart_payment_cards CartPaymentCard[]
 
-  cupom_id String?
-  status      Cart_status @default(EM_PROCESSAMENTO)
-  paid_status Paid_status @default(NOT_PAID)
+  cupom_id     String?
+  cupom        Coupon?     @relation(fields: [cupom_id], references: [id])
+  status       Cart_status @default(EM_PROCESSAMENTO)
+  paid_status  Paid_status @default(NOT_PAID)
   address_id   String?
-  address      Address?       @relation(fields: [address_id], references: [id])
+  address      Address?    @relation(fields: [address_id], references: [id])
+  delivery_fee Float       @default(0)
 
-  expires_at      DateTime?
-  created_at      DateTime         @default(now())
-  updated_at      DateTime         @updatedAt
+  expires_at DateTime?
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
 
   @@map("carts")
 }
@@ -146,17 +148,18 @@ enum Cart_status {
 model Coupon {
   id String @id @default(uuid())
 
-  user_id String? @unique
+  user_id String?
   user    User?   @relation(fields: [user_id], references: [id])
 
   type Coupon_type @default(discount)
 
-  code            String
-  quantity        Int @default(1)
-  discount        Float
-  expires_at      DateTime?
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
+  code       String
+  quantity   Int       @default(1)
+  discount   Float
+  expires_at DateTime?
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  Cart       Cart[]
 
   @@map("coupons")
 }
@@ -175,8 +178,8 @@ model PaymentCard {
   brand             String
   holder_name       String
 
-  created_at      DateTime          @default(now())
-  updated_at      DateTime          @updatedAt
+  created_at         DateTime          @default(now())
+  updated_at         DateTime          @updatedAt
   cart_payment_cards CartPaymentCard[]
 
   @@map("payment_cards")

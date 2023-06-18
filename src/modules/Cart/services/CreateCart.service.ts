@@ -16,9 +16,8 @@ class CreateCartService {
     private cartRepository: ICartRepository,
 
     @inject('ProductRepository')
-    private productRepository: IProductRepository,
-  ) //time_available_in_minutes = 30,
-  {
+    private productRepository: IProductRepository, //time_available_in_minutes = 30,
+  ) {
     //this.time_available_in_minutes = time_available_in_minutes;
   }
 
@@ -44,7 +43,7 @@ class CreateCartService {
     const cart = await this.cartRepository.create({
       user_id: cartParams.request_id,
       cart_items: items.map(item => ({
-        product_id: item.product.id,
+        product: item.product,
         quantity: item.quantity,
       })),
       cupom_code,

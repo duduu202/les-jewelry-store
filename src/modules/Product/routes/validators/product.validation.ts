@@ -40,3 +40,9 @@ export const deleteProductMiddleware = celebrate({
     id: Joi.string().uuid().required(),
   },
 });
+
+export const refundProductMiddleware = celebrate({
+  [Segments.PARAMS]: {
+    id: Joi.string().uuid().required(),
+  },
+});

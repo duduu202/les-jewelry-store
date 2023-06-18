@@ -33,13 +33,11 @@ class PatchCartService {
     const user = await this.userRepository.findBy({
       id: request_id,
     });
-
     if (!user || user.role !== 'Master') {
       throw new AppError('Operação não autorizada', 401);
     }
     if (!cart) throw new AppError('Carrinho não encontrado', 404);
     if (status === cart.status) return cart;
-
     if (
       status === Cart_status.EM_TRANSITO &&
       cart.status !== Cart_status.APROVADA
@@ -50,7 +48,7 @@ class PatchCartService {
     if (status === Cart_status.TROCA_AUTORIZADA) {
       if (cart.paid_status === Paid_status.REFUNDED)
         throw new AppError('Carrinho já foi trocado', 401);
-      const coupon = this.generateCoupon(cart);
+      const coupon = await this.generateCoupon(cart);
       cart.paid_status = Paid_status.REFUNDED;
       console.log('generated coupon: ', coupon);
     }

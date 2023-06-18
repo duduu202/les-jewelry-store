@@ -6,6 +6,7 @@ import { plainToInstance } from 'class-transformer';
 import { IUserRepository } from '../repositories/UserRepository.interface';
 import { ICreateUserDTO } from './dto/CreateUserDTO';
 import { User } from '../entities/User';
+import { IStorageProvider } from '@shared/container/providers/StorageProvider/models/IStorageProvider';
 
 @injectable()
 class CreateUserService {
@@ -15,6 +16,9 @@ class CreateUserService {
 
     @inject('HashProvider')
     private hashProvider: IHashProvider,
+
+    @inject('StorageProvider')
+    private storageProvider: IStorageProvider,
   ) {}
 
   public async execute({ ...userParams }: ICreateUserDTO): Promise<User> {

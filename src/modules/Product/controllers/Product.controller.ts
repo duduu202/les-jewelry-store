@@ -8,8 +8,6 @@ import { ListProductService } from '../services/ListProduct.service';
 import { ShowProductService } from '../services/ShowProduct.service';
 import { UpdateProductService } from '../services/UpdateProduct.service';
 
-
-
 class ProductController {
   async create(req: Request, res: Response): Promise<Response> {
     const { price, stock, name, description } = req.body;
@@ -18,7 +16,7 @@ class ProductController {
     //}
 
     const createProductService = container.resolve(CreateProductService);
-    
+
     const Product = await createProductService.execute({
       price,
       stock,
@@ -29,7 +27,6 @@ class ProductController {
 
     return res.status(201).json(instanceToInstance(Product));
   }
-
 
   async show(req: Request, res: Response): Promise<Response> {
     const { id } = req.params;

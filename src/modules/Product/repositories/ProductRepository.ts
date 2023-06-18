@@ -14,7 +14,7 @@ class ProductRepository implements IProductRepository {
     const product = await prisma.product.findFirst({
       where: { ...filter },
     });
-    if(!product) return null;
+    if (!product) return null;
 
     const notPaidCount = await prisma.cart.count({
       where: {
@@ -26,7 +26,6 @@ class ProductRepository implements IProductRepository {
                 // not paid and not EXPIRED
                 // not: 'PAID', and not: 'EXPIRED'
                 notIn: ['PAID', 'EXPIRED'],
-
               },
             },
           },
@@ -69,33 +68,34 @@ class ProductRepository implements IProductRepository {
       },
     });
 
-
     // stock means the total of products in stock
     // stock_available means the total of products in stock that are available to sell, not reserved
     // because a cart can reserve a product, but the product is still in stock
-    const productsWithStock = await Promise.all(products.map(async (product) => {
-      const notPaidCount = await prisma.cart.count({
-        where: {
-          cart_items: {
-            some: {
-              product_id: product.id,
-              cart: {
-                paid_status: {
-                  not: 'PAID',
+    const productsWithStock = await Promise.all(
+      products.map(async product => {
+        const notPaidCount = await prisma.cart.count({
+          where: {
+            cart_items: {
+              some: {
+                product_id: product.id,
+                cart: {
+                  paid_status: {
+                    not: 'PAID',
+                  },
                 },
               },
             },
           },
-        },
-      });
-    
-      return {
-        ...product,
-        stock: product.stock,
-        stock_available: product.stock - notPaidCount,
-      };
-    }));
-    
+        });
+
+        return {
+          ...product,
+          stock: product.stock,
+          stock_available: product.stock - notPaidCount,
+        };
+      }),
+    );
+
     return {
       results: productsWithStock as EntityProduct[],
       total: productTotal,
@@ -104,8 +104,8 @@ class ProductRepository implements IProductRepository {
     };
   }
 
-  async create({...datas }: IProductCreate): Promise<Product> {
-    console.log("datas", datas);
+  async create({ ...datas }: IProductCreate): Promise<Product> {
+    console.log('datas', datas);
     const product = await prisma.product.create({
       data: {
         ...datas,

@@ -6,7 +6,7 @@ import { IProductCreate } from './dto/ProductRepositoryDTO';
 
 interface IProductRepository {
   findBy(
-    filter: Partial<Product>,
+    filter: Partial<EntityProduct>,
     //include?: { [key: string]: boolean },
   ): Promise<EntityProduct | null>;
   listBy(

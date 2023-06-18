@@ -60,13 +60,14 @@ class CreateExchangeItemsService {
     const exchangeCart = await this.cartRepository.create({
       user_id: request_id,
       cart_items: exchangedItems.map(item => ({
-        product_id: item.product.id,
+        product: item.product,
         quantity: item.quantity,
       })),
       status: Cart_status.EM_TROCA,
     });
 
     // remove those items from the original cart
+
     await this.cartRepository.update({
       id: cart_id,
       address_id: cart.address_id,

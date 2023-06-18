@@ -1,20 +1,24 @@
 import { Router } from 'express';
 import { uploadMulter } from '@config/upload';
 import { verifyToken } from '@shared/middleware/verifyToken';
-import verifyAuthorization from '@shared/middleware/verifyAuthorization';
-import { UserRole } from '@prisma/client';
 import {
   createProductMiddleware,
   deleteProductMiddleware,
   listProductMiddleware,
+  refundProductMiddleware,
   showProductMiddleware,
   updateProductMiddleware,
 } from './validators/product.validation';
 import { ProductController } from '../controllers/Product.controller';
+import verifyAuthorization from '@shared/middleware/verifyAuthorization';
+import { UserRole } from '@prisma/client';
 
 const productRouter = Router();
 const productController = new ProductController();
 
+productRouter.use(verifyToken);
+
+productRouter.use(verifyAuthorization([UserRole.Customer, UserRole.Master]));
 productRouter.get('/', listProductMiddleware, productController.index);
 productRouter.get('/:id', showProductMiddleware, productController.show);
 
