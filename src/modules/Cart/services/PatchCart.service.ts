@@ -54,7 +54,21 @@ class PatchCartService {
     }
 
     cart.status = status;
-    this.cartRepository.update(cart);
+    this.cartRepository.update({
+      id: cart.id,
+      address_id: cart.address_id,
+      cart_items: cart.cart_items,
+      cart_payment_cards: cart.cart_payment_cards,
+      paid_status: cart.paid_status,
+      status: cart.status,
+      user_id: cart.user_id,
+      coupon_ids: cart.coupons.map(coupon => coupon.id),
+      cupom_id: cart.cupom_id,
+      delivery_fee: 0,
+      created_at: cart.created_at,
+      expires_at: cart.expires_at,
+      updated_at: cart.updated_at,
+    });
 
     return plainToInstance(Cart, cart);
   }

@@ -30,7 +30,7 @@ export const payCartMiddleware = celebrate({
       )
       .min(1)
       .required(),
-    coupon_code: Joi.string(),
+    coupon_codes: Joi.array().items(Joi.string()).min(1),
     address_id: Joi.string().uuid().required(),
   },
 });

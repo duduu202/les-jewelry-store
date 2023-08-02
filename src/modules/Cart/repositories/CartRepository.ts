@@ -5,7 +5,11 @@ import { IPaginatedResponse } from '@shared/interfaces/IPaginatedResponse';
 import { ICartCreate, ICartUpdate } from './dto/CartRepositoryDTO';
 import { ICartRepository } from './CartRepository.interface';
 import { Cart as EntityCart } from '../entities/Cart';
-import { getDeliveryFee, getTotalDiscount, sumTotalPrice } from '../util/CartValues';
+import {
+  getDeliveryFee,
+  getTotalDiscount,
+  sumTotalPrice,
+} from '../util/CartValues';
 
 class CartRepository implements ICartRepository {
   async findBy(
@@ -16,6 +20,11 @@ class CartRepository implements ICartRepository {
       where: { ...filter },
       include: {
         cupom: true,
+        coupons: {
+          include: {
+            coupon: true,
+          },
+        },
         cart_items: {
           include: {
             product: true,
@@ -25,7 +34,17 @@ class CartRepository implements ICartRepository {
     });
     if (!cart) return null;
 
-    return cart as EntityCart;
+    const products = cart.cart_items.map(item => {
+      return { product: item.product, quantity: item.quantity };
+    });
+    const cartEntity = {
+      ...cart,
+      products_price: sumTotalPrice(cart as EntityCart),
+      discount: getTotalDiscount(cart as EntityCart),
+      total_price: sumTotalPrice(cart as EntityCart, true, true),
+    };
+
+    return cartEntity as EntityCart;
   }
 
   public async listBy({
@@ -44,6 +63,11 @@ class CartRepository implements ICartRepository {
       },
       include: {
         cupom: true,
+        coupons: {
+          include: {
+            coupon: true,
+          },
+        },
         cart_items: {
           include: {
             product: true,
@@ -123,10 +147,25 @@ class CartRepository implements ICartRepository {
       },
     });
 
+    await prisma.couponCart.deleteMany({
+      where: {
+        cart_id: id,
+      },
+    });
+
     const delivery_fee = getDeliveryFee(datas.cart_items, datas.status);
     const updatedCart = await prisma.cart.update({
       where: { id },
       data: {
+        coupons: {
+          create: datas.coupon_ids
+            ? datas.coupon_ids.map(coupon_id => {
+                return {
+                  coupon_id,
+                };
+              })
+            : [],
+        },
         delivery_fee: delivery_fee,
         paid_status: datas.paid_status,
         address_id: datas.address_id,

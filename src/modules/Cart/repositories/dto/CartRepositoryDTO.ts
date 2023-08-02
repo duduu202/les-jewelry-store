@@ -15,7 +15,8 @@ export interface ICartUpdate {
   delivery_fee?: number;
   address_id: string | null;
   expires_at: Date | null;
-  cupom_id: string | null;
+  cupom_id?: string | null;
+  coupon_ids?: string[];
   paid_status: Paid_status;
   id: string;
   user_id: string;

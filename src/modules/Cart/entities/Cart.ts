@@ -13,6 +13,7 @@ class Cart implements ICart {
   expires_at: Date | null;
   cupom_id: string | null;
   cupom: Coupon;
+  coupons: Coupon[];
   paid_status: Paid_status;
   id: string;
   user_id: string;

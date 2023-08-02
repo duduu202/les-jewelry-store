@@ -115,6 +115,7 @@ model Cart {
 
   cupom_id     String?
   cupom        Coupon?     @relation(fields: [cupom_id], references: [id])
+  coupons CouponCart[]
   status       Cart_status @default(EM_PROCESSAMENTO)
   paid_status  Paid_status @default(NOT_PAID)
   address_id   String?
@@ -126,6 +127,22 @@ model Cart {
   updated_at DateTime  @updatedAt
 
   @@map("carts")
+}
+
+model CouponCart {
+  id String @id @default(uuid())
+
+  cart_id String
+  cart    Cart   @relation(fields: [cart_id], references: [id])
+
+  coupon_id String
+  coupon    Coupon @relation(fields: [coupon_id], references: [id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@unique([cart_id, coupon_id])
+  @@map("coupon_carts")
 }
 
 enum Paid_status {
@@ -152,6 +169,8 @@ model Coupon {
   user    User?   @relation(fields: [user_id], references: [id])
 
   type Coupon_type @default(discount)
+
+  carts CouponCart[]
 
   code       String
   quantity   Int       @default(1)

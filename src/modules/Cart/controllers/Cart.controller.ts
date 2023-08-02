@@ -28,7 +28,7 @@ class CartController {
   async pay(req: Request, res: Response): Promise<Response> {
     const { id } = req.params;
     const { user } = req;
-    const { payment_cards, coupon_code, address_id } = req.body;
+    const { payment_cards, coupon_codes, address_id } = req.body;
 
     const payCartService = container.resolve(PayCartService);
 
@@ -36,7 +36,7 @@ class CartController {
       cart_id: id,
       payment_cards,
       request_id: user.id,
-      coupon_code,
+      coupon_codes,
       address_id,
     });
 

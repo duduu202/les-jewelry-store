@@ -19,20 +19,18 @@ import { IPaymentCardRepository } from '@modules/PaymentCard/repositories/Paymen
 import { Product } from '@modules/Product/entities/Product';
 import { PaymentCard } from '@modules/PaymentCard/entities/PaymentCard';
 import { IAddressRepository } from '@modules/Address/repositories/AddressRepository.interface';
+import { sumTotalPrice } from '../util/CartValues';
 
 interface ConfirmPayment {
   cart: Cart;
   validated_cards: { payment_card: PaymentCard; percentage: number }[];
   products: { product: Product; quantity: number }[];
-  total_value: number;
   cupom_id?: string;
-  discount: number;
-  coupon?: Coupon;
+  coupon?: Coupon[];
   address: Address;
 }
 @injectable()
 class PayCartService {
-  freight_value_percentage = 0.1;
   constructor(
     @inject('CartRepository')
     private cartRepository: ICartRepository,
@@ -54,7 +52,7 @@ class PayCartService {
 
   public async execute({ ...cartParams }: IPayCartDTO): Promise<Cart> {
     console.log(cartParams.request_id);
-    const { payment_cards, coupon_code, request_id, cart_id } = cartParams;
+    const { payment_cards, coupon_codes, request_id, cart_id } = cartParams;
 
     const cart = await this.cartRepository.findBy({
       id: cart_id,
@@ -72,32 +70,29 @@ class PayCartService {
     if (!address) throw new AppError('Endereço não encontrado', 404);
 
     const products = await this.checkProducts(cart);
-    let discount = 0;
-    let coupon: Coupon | undefined = undefined;
-    let total_value = products.reduce((total, product) => {
-      return total + product.product.price * product.quantity;
-    }, 0);
+    let coupon: Coupon[] | undefined = undefined;
 
-    if (coupon_code) {
-      coupon = await this.checkCupom(coupon_code, request_id);
-      discount += coupon.discount;
+    if (coupon_codes) {
+      coupon = await this.checkCupom(
+        coupon_codes,
+        request_id,
+        sumTotalPrice(cart, true),
+      );
     }
-
     console.log('payment_cards');
     console.log(payment_cards);
     const validated_cards = await this.checkPaymentCardSplit(
       payment_cards,
-      total_value,
+      sumTotalPrice(cart, true, true),
     );
 
     const updated_cart = await this.confirmPayment({
-      cart,
-      validated_cards,
-      products,
-      total_value,
-      discount,
-      coupon,
       address,
+      cart,
+      products,
+      validated_cards,
+      coupon,
+      cupom_id: coupon_codes ? coupon_codes[0] : undefined,
     });
     return plainToInstance(Cart, updated_cart);
   }
@@ -117,25 +112,40 @@ class PayCartService {
   }
 
   private async checkCupom(
-    coupon_code: string,
+    coupon_codes: string[],
     user_id: string,
-  ): Promise<Coupon> {
-    const coupon = await this.couponRepository.findBy({
-      code: coupon_code,
-    });
-    if (!coupon) throw new AppError('Cupom não encontrado', 404);
-    if (coupon.type == Coupon_type.exchange && user_id != coupon.user_id) {
-      throw new AppError('Cupom não encontrado', 404);
-    }
-    if (coupon.expires_at && new Date(coupon.expires_at) < new Date())
-      throw new AppError('Cupom expirado', 400);
-    if (coupon.quantity <= 0) throw new AppError('Cupom esgotado', 400);
-    return coupon;
+    total_in_cart: number,
+  ): Promise<Coupon[]> {
+    let discount = 0;
+    const coupons = Promise.all(
+      coupon_codes.map(async coupon_code => {
+        const coupon = await this.couponRepository.findBy({
+          code: coupon_code,
+        });
+        if (!coupon) throw new AppError('Cupom não encontrado', 404);
+        if (coupon.type == Coupon_type.exchange && user_id != coupon.user_id) {
+          throw new AppError('Cupom não encontrado', 404);
+        }
+        if (coupon.expires_at && new Date(coupon.expires_at) < new Date())
+          throw new AppError('Cupom expirado', 400);
+        if (coupon.quantity <= 0) throw new AppError('Cupom esgotado', 400);
+        if (discount > total_in_cart)
+          throw new AppError(
+            'Cupom desnecessário, pois o valor do cupom já ultrapassou o valor do carrinho: ' +
+              coupon.code +
+              coupon.discount,
+            400,
+          );
+        discount += coupon.discount;
+        return coupon;
+      }),
+    );
+    return coupons;
   }
 
   private async checkPaymentCardSplit(
     payment_cards: { card_id: string; percentage: number }[],
-    card_value: number,
+    total_in_cart: number,
   ): Promise<{ payment_card: PaymentCard; percentage: number }[]> {
     if (payment_cards.length == 0)
       throw new AppError('Nenhum cartão selecionado', 400);
@@ -162,7 +172,7 @@ class PayCartService {
 
     // min 10 reais
     const min_value = 10;
-    const min_value_percentage = min_value / card_value;
+    const min_value_percentage = min_value / total_in_cart;
     validated_cards.forEach(card => {
       if (card.percentage < min_value_percentage)
         throw new AppError('Cada cartão deve pagar no minimo 10 reais', 400);
@@ -193,10 +203,11 @@ class PayCartService {
     datas.cart.status = Cart_status.APROVADA;
     datas.cart.paid_status = Paid_status.PAID;
     if (datas.coupon) {
-      datas.coupon.quantity -= 1;
+      // datas.coupon.quantity -= 1;
+      datas.coupon.map(coupon => {
+        coupon.quantity -= 1;
+      });
     }
-    datas.total_value -= datas.discount;
-    datas.total_value += datas.total_value * this.freight_value_percentage;
 
     try {
       // TODO Payment Gateway Request
@@ -207,8 +218,12 @@ class PayCartService {
       throw new AppError('Pagamento não autorizado', 400);
     }
 
-    if (datas.coupon) {
-      await this.couponRepository.update(datas.coupon);
+    if (datas.coupon && datas.coupon.length > 0) {
+      Promise.all(
+        datas.coupon.map(async coupon => {
+          await this.couponRepository.update(coupon);
+        }),
+      );
     }
     datas.products.forEach(async product => {
       product.product.stock -= product.quantity;
@@ -224,12 +239,17 @@ class PayCartService {
       });
     });
 
-    const cart = await this.cartRepository.update({
+    await this.cartRepository.update({
       created_at: datas.cart.created_at,
       id: datas.cart.id,
       user_id: datas.cart.user_id,
       address_id: datas.address.id,
-      cupom_id: datas.coupon ? datas.coupon.id : null,
+      cupom_id: datas.coupon ? datas.coupon[0].id : null,
+      coupon_ids: datas.coupon
+        ? datas.coupon.map(coupon => {
+            return coupon.id;
+          })
+        : [],
       expires_at: datas.cart.expires_at,
       paid_status: datas.cart.paid_status,
       status: datas.cart.status,
@@ -237,8 +257,27 @@ class PayCartService {
       cart_items: datas.cart.cart_items,
       cart_payment_cards: datas.cart.cart_payment_cards,
     });
+    const updatedCart = await this.cartRepository.findBy({
+      id: datas.cart.id,
+    });
+    if (!updatedCart) throw new AppError('Erro inexperado', 400);
+    const discounts = datas.coupon?.map(coupon => coupon.discount);
+    const total_discount = discounts
+      ? discounts.reduce((total, discount) => total + discount, 0)
+      : 0;
+    const total_cart = sumTotalPrice(updatedCart, true);
 
-    return cart;
+    if (updatedCart.total_price < 0) {
+      const coupon_difference = await this.couponRepository.create({
+        code: 'DIF-' + Math.abs(updatedCart.total_price),
+        discount: Math.abs(updatedCart.total_price),
+        user_id: updatedCart.user_id,
+        type: Coupon_type.exchange,
+      });
+    }
+    console.log('differences');
+    console.log(discounts, total_discount, total_cart);
+    return updatedCart;
   }
 }
 
