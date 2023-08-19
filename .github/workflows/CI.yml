@@ -60,6 +60,9 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd ~/apps/les-jewelry-store
+            pwd
+            echo $USER
+            echo $PATH
             yarn
             ./node_modules/.bin/prisma migrate dev
             pm2 restart les-jewelry-store
