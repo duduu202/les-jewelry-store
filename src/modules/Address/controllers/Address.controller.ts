@@ -7,8 +7,6 @@ import { ListAddressService } from '../services/ListAddress.service';
 import { ShowAddressService } from '../services/ShowAddress.service';
 import { UpdateAddressService } from '../services/UpdateAddress.service';
 
-
-
 class AddressController {
   async create(req: Request, res: Response): Promise<Response> {
     const { street, number, district, city, state, zip_code } = req.body;
@@ -67,7 +65,7 @@ class AddressController {
 
     const Address = await updateAddressService.execute({
       id,
-      request_id: req.user.id,
+      request_id: req.user.isMaster ? undefined : req.user.id,
       ...data,
     });
 

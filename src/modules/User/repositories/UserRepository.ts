@@ -13,6 +13,9 @@ class UserRepository implements IUserRepository {
   ): Promise<EntityUser | null> {
     const user = await prisma.user.findFirst({
       where: { ...filter },
+      include: include || {
+        address: true,
+      },
     });
 
     return user as EntityUser;
@@ -56,7 +59,13 @@ class UserRepository implements IUserRepository {
     };
   }
 
-  async create({ name, email, password, CPF, phone }: IUserCreate): Promise<User> {
+  async create({
+    name,
+    email,
+    password,
+    CPF,
+    phone,
+  }: IUserCreate): Promise<User> {
     const user = await prisma.user.create({
       data: {
         name,
@@ -69,7 +78,15 @@ class UserRepository implements IUserRepository {
     return user;
   }
 
-  async update({ name, email, password, role, id, CPF, phone }: User): Promise<User> {
+  async update({
+    name,
+    email,
+    password,
+    role,
+    id,
+    CPF,
+    phone,
+  }: User): Promise<User> {
     const updatedUser = await prisma.user.update({
       where: { id },
       data: {
@@ -78,7 +95,7 @@ class UserRepository implements IUserRepository {
         password,
         role,
         CPF,
-        phone
+        phone,
       },
     });
 

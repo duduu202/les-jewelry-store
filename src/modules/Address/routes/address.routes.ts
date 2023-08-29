@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import { verifyToken } from '@shared/middleware/verifyToken';
 import { AddressController } from '../controllers/Address.controller';
-import { 
+import {
   createAddressMiddleware,
   deleteAddressMiddleware,
   listAddressMiddleware,
   showAddressMiddleware,
-  updateAddressMiddleware
+  updateAddressMiddleware,
 } from './validators/address.validation';
 
 const addressRouter = Router();
@@ -19,6 +19,5 @@ addressRouter.get('/', listAddressMiddleware, addressController.index);
 addressRouter.get('/:id', showAddressMiddleware, addressController.show);
 addressRouter.delete('/:id', deleteAddressMiddleware, addressController.delete);
 addressRouter.put('/:id', updateAddressMiddleware, addressController.update);
-
 
 export { addressRouter };

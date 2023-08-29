@@ -49,6 +49,4 @@ userRouter.get('/', listUserMiddleware, userController.index);
 
 userRouter.get('/:user_id', showUserMiddleware, userController.show);
 
-
-
 export { userRouter };

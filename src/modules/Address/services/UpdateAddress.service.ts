@@ -18,8 +18,9 @@ class UpdateAddressService {
     request_id,
     ...addressParams
   }: IUpdateAddressDTO): Promise<Address> {
+    console.log('addressParams', id);
     const address = await this.addressRepository.findBy({
-      id: id,
+      id,
       user_id: request_id,
     });
 
