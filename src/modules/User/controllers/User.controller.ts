@@ -70,7 +70,7 @@ class UserController {
     const user = await updateUserService.execute({
       user_id,
       isMaster: req.user.isMaster,
-      request_id: req.user.id,
+      request_id: req.user.isMaster ? user_id : req.user.id,
       ...data,
     });
 

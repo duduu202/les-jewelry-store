@@ -23,7 +23,7 @@ class UserRepository implements IUserRepository {
 
   public async listBy({
     page = 1,
-    limit = 10,
+    limit = undefined,
     filters,
     search,
   }: IPaginatedRequest<User>): Promise<IPaginatedResponse<EntityUser>> {
@@ -37,7 +37,7 @@ class UserRepository implements IUserRepository {
           mode: 'insensitive',
         },
       },
-      skip: (page - 1) * limit,
+      skip: limit ? (page - 1) * limit : undefined,
       take: limit,
     });
 

@@ -12,7 +12,10 @@ class DeleteAddressService {
   ) {}
 
   public async execute({ id, request_id }: IDeleteAddressDTO): Promise<void> {
-    const address = await this.addressRepository.findBy({ id, user_id: request_id });
+    const address = await this.addressRepository.findBy({
+      id,
+      user_id: request_id,
+    });
 
     if (!address) throw new AppError('Enderço não encontrado', 404);
 

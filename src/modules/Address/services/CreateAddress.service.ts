@@ -17,7 +17,9 @@ class CreateAddressService {
     private hashProvider: IHashProvider,
   ) {}
 
-  public async execute({ ...addressParams }: ICreateAddressDTO): Promise<Address> {
+  public async execute({
+    ...addressParams
+  }: ICreateAddressDTO): Promise<Address> {
     const address = await this.addressRepository.create({
       ...addressParams,
     });

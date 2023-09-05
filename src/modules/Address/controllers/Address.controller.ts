@@ -9,7 +9,8 @@ import { UpdateAddressService } from '../services/UpdateAddress.service';
 
 class AddressController {
   async create(req: Request, res: Response): Promise<Response> {
-    const { street, number, district, city, state, zip_code } = req.body;
+    const { street, number, district, city, state, zip_code, user_id } =
+      req.body;
     const createAddressService = container.resolve(CreateAddressService);
 
     const Address = await createAddressService.execute({
@@ -19,7 +20,7 @@ class AddressController {
       state,
       street,
       zip_code,
-      user_id: req.user.id,
+      user_id: req.user.isMaster ? user_id : req.user.id,
     });
 
     return res.status(201).json(instanceToInstance(Address));
@@ -79,7 +80,7 @@ class AddressController {
 
     await deleteAddressService.execute({
       id,
-      request_id: req.user.id,
+      request_id: req.user.isMaster ? undefined : req.user.id,
     });
 
     return res.status(204).send();
