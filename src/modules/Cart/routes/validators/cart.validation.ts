@@ -7,7 +7,7 @@ export const createCartMiddleware = celebrate({
       .items(
         Joi.object({
           product_id: Joi.string().uuid().required(),
-          quantity: Joi.number().min(1).required(),
+          quantity: Joi.number().min(0).required(),
         }),
       )
       .min(1)
@@ -59,7 +59,7 @@ export const updateCartMiddleware = celebrate({
       .items(
         Joi.object({
           product_id: Joi.string().uuid().required(),
-          quantity: Joi.number().min(1).required(),
+          quantity: Joi.number().min(0).required(),
         }),
       )
       .min(1)
