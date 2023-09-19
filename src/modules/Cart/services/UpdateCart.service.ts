@@ -33,10 +33,13 @@ class UpdateCartService {
 
     if (!cart) throw new AppError('Usuário não encontrado', 404);
 
-    if (cart_items.length === 0) throw new AppError('Carrinho vazio', 400);
+    // if (cart_items.length === 0) throw new AppError('Carrinho vazio', 400);
 
-    const items = await Promise.all(
+    const foundItems = await Promise.all(
       cart_items.map(async item => {
+        if (item.quantity <= 0) {
+          return null;
+        }
         const product = await this.productRepository.findBy({
           id: item.product_id,
         });
@@ -47,15 +50,17 @@ class UpdateCartService {
       }),
     );
 
+    const items = foundItems.filter(item => item !== null);
+
     const uptated_cart = await this.cartRepository.update({
       user_id: request_id,
       cart_items: items.map(item => ({
-        product: item.product,
-        quantity: item.quantity,
+        product: item!.product,
+        quantity: item!.quantity,
         cart_id: id,
         created_at: new Date(),
         updated_at: new Date(),
-        product_id: item.product.id,
+        product_id: item!.product.id,
         id: v4(),
       })),
       expires_at: new Date(Date.now() + this.time_available_in_minutes * 60000),

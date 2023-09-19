@@ -59,10 +59,9 @@ export const updateCartMiddleware = celebrate({
       .items(
         Joi.object({
           product_id: Joi.string().uuid().required(),
-          quantity: Joi.number().min(0).default(0),
+          quantity: Joi.number().default(0),
         }),
       )
-      .min(1)
       .required(),
     cupom_code: Joi.string(),
   },
