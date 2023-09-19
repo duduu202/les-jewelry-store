@@ -44,7 +44,7 @@ export function getDeliveryFee(
     return acc + item.product.price * item.quantity;
   }, 0);
   delivery_fee -= coupon?.discount || 0;
-  delivery_fee = delivery_fee * (percentage / 100);
+  delivery_fee *= percentage / 100;
   delivery_fee = Math.round(delivery_fee * 100) / 100;
   if (cart_status === 'TROCA_AUTORIZADA' || cart_status === 'EM_TROCA') {
     delivery_fee = 0;

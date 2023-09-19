@@ -9,6 +9,7 @@ export interface ICartCreate {
   cupom_code?: string;
   expires_at?: Date;
   status?: Cart_status;
+  is_current?: boolean;
 }
 
 export interface ICartUpdate {

@@ -109,6 +109,8 @@ model Cart {
   id      String @id @default(uuid())
   user_id String
 
+  is_current Boolean @default(false)
+
   // many to many
   cart_items         CartItems[]
   cart_payment_cards CartPaymentCard[]

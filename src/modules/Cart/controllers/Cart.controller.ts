@@ -10,6 +10,7 @@ import { ShowCartService } from '../services/ShowCart.service';
 import { UpdateCartService } from '../services/UpdateCart.service';
 import { PatchCartService } from '../services/PatchCart.service';
 import { CreateExchangeItemsService } from '../services/CreateExchangeItems.service';
+import { GetCurrentCartService } from '../services/GetCurrentCart.service';
 
 class CartController {
   async create(req: Request, res: Response): Promise<Response> {
@@ -52,6 +53,18 @@ class CartController {
     const Cart = await showCartService.execute({
       id,
       request_id: user.id,
+    });
+
+    return res.json(Cart);
+  }
+
+  async current_cart(req: Request, res: Response): Promise<Response> {
+    const { user } = req;
+
+    const getCurrentCartService = container.resolve(GetCurrentCartService);
+
+    const Cart = await getCurrentCartService.execute({
+      request_id: user.id as string,
     });
 
     return res.json(Cart);
