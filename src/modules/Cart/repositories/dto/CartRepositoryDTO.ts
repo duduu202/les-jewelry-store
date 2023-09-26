@@ -25,4 +25,5 @@ export interface ICartUpdate {
   status: Cart_status;
   created_at: Date;
   updated_at: Date;
+  is_current: boolean;
 }

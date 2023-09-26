@@ -3,10 +3,7 @@ import { inject, injectable } from 'tsyringe';
 import { AppError } from '@shared/error/AppError';
 import { IHashProvider } from '@shared/container/providers/HashProvider/model/IHashProvider';
 import { plainToInstance } from 'class-transformer';
-import { ICartRepository } from '../repositories/CartRepository.interface';
 import { IProductRepository } from '@modules/Product/repositories/ProductRepository.interface';
-import { Cart } from '../entities/Cart';
-import { IPayCartDTO } from './dto/PayCartDTO copy';
 import {
   Cart_status,
   Paid_status,
@@ -19,6 +16,9 @@ import { IPaymentCardRepository } from '@modules/PaymentCard/repositories/Paymen
 import { Product } from '@modules/Product/entities/Product';
 import { PaymentCard } from '@modules/PaymentCard/entities/PaymentCard';
 import { IAddressRepository } from '@modules/Address/repositories/AddressRepository.interface';
+import { IPayCartDTO } from './dto/PayCartDTO copy';
+import { Cart } from '../entities/Cart';
+import { ICartRepository } from '../repositories/CartRepository.interface';
 
 interface ConfirmPayment {
   cart: Cart;
@@ -33,6 +33,7 @@ interface ConfirmPayment {
 @injectable()
 class PayCartService {
   freight_value_percentage = 0.1;
+
   constructor(
     @inject('CartRepository')
     private cartRepository: ICartRepository,
@@ -49,7 +50,7 @@ class PayCartService {
     @inject('AddressRepository')
     private addressRepository: IAddressRepository,
   ) {
-    //this.time_available_in_minutes = time_available_in_minutes;
+    // this.time_available_in_minutes = time_available_in_minutes;
   }
 
   public async execute({ ...cartParams }: IPayCartDTO): Promise<Cart> {
@@ -73,8 +74,8 @@ class PayCartService {
 
     const products = await this.checkProducts(cart);
     let discount = 0;
-    let coupon: Coupon | undefined = undefined;
-    let total_value = products.reduce((total, product) => {
+    let coupon: Coupon | undefined;
+    const total_value = products.reduce((total, product) => {
       return total + product.product.price * product.quantity;
     }, 0);
 
@@ -109,6 +110,10 @@ class PayCartService {
       throw new AppError('Carrinho expirado', 400);
     }
     if (cart.paid_status == Paid_status.PAID) {
+      if (cart.is_current) {
+        cart.is_current = false;
+        await this.cartRepository.update(cart);
+      }
       throw new AppError('Carrinho já pago', 400);
     }
     if (cart.paid_status == Paid_status.REFUNDED) {
@@ -236,6 +241,7 @@ class PayCartService {
       updated_at: datas.cart.updated_at,
       cart_items: datas.cart.cart_items,
       cart_payment_cards: datas.cart.cart_payment_cards,
+      is_current: false,
     });
 
     return cart;

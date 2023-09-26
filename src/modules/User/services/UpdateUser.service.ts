@@ -20,6 +20,7 @@ class UpdateUserService {
   public async execute({
     user_id,
     request_id,
+    isMaster,
     ...userParams
   }: IUpdateUserDTO): Promise<User> {
     const { password, ...rest } = userParams;
@@ -45,7 +46,7 @@ class UpdateUserService {
     });
 
     console.log('cpf ', CPFExists, user_id);
-    if (CPFExists && userParams?.CPF && CPFExists.id !== user_id)
+    if (CPFExists && userParams?.CPF && CPFExists.id !== user_id && !isMaster)
       throw new AppError('CPF já cadastrado', 409);
 
     if (userParams.CPF) user.CPF = userParams.CPF;

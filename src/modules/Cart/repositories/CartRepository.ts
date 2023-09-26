@@ -5,12 +5,16 @@ import { IPaginatedResponse } from '@shared/interfaces/IPaginatedResponse';
 import { ICartCreate, ICartUpdate } from './dto/CartRepositoryDTO';
 import { ICartRepository } from './CartRepository.interface';
 import { Cart as EntityCart } from '../entities/Cart';
-import { getDeliveryFee, getTotalDiscount, sumTotalPrice } from '../util/CartValues';
+import {
+  getDeliveryFee,
+  getTotalDiscount,
+  sumTotalPrice,
+} from '../util/CartValues';
 
 class CartRepository implements ICartRepository {
   async findBy(
     filter: Partial<Cart>,
-    //include?: { [key: string]: boolean },
+    // include?: { [key: string]: boolean },
   ): Promise<EntityCart | null> {
     const cart = await prisma.cart.findFirst({
       where: { ...filter },
@@ -25,22 +29,27 @@ class CartRepository implements ICartRepository {
     });
     if (!cart) return null;
 
-    return cart as EntityCart;
+    return {
+      products_price: sumTotalPrice(cart as EntityCart),
+      discount: getTotalDiscount(cart as EntityCart),
+      total_price: sumTotalPrice(cart as EntityCart, true, true),
+      ...cart,
+    } as EntityCart;
   }
 
   public async listBy({
     page = 1,
     limit = 10,
     filters,
-  }: //search,
+  }: // search,
   IPaginatedRequest<Cart>): Promise<IPaginatedResponse<EntityCart>> {
     const carts = await prisma.cart.findMany({
       where: filters && {
         ...filters,
-        //name: {
+        // name: {
         //  contains: search,
         //  mode: 'insensitive',
-        //},
+        // },
       },
       include: {
         cupom: true,
@@ -50,6 +59,9 @@ class CartRepository implements ICartRepository {
           },
         },
       },
+      orderBy: {
+        updated_at: 'desc',
+      },
       skip: (page - 1) * limit,
       take: limit,
     });
@@ -57,10 +69,10 @@ class CartRepository implements ICartRepository {
     const cartTotal = await prisma.cart.count({
       where: filters && {
         ...filters,
-        //name: {
+        // name: {
         //  contains: search,
         //  mode: 'insensitive',
-        //},
+        // },
       },
     });
 
@@ -96,7 +108,7 @@ class CartRepository implements ICartRepository {
         cart_items: {
           create: cart_items_data,
         },
-        delivery_fee: delivery_fee,
+        delivery_fee,
       },
     });
 
@@ -127,7 +139,7 @@ class CartRepository implements ICartRepository {
     const updatedCart = await prisma.cart.update({
       where: { id },
       data: {
-        delivery_fee: delivery_fee,
+        delivery_fee,
         paid_status: datas.paid_status,
         address_id: datas.address_id,
         created_at: datas.created_at,
@@ -138,6 +150,7 @@ class CartRepository implements ICartRepository {
         cart_payment_cards: {
           create: datas.cart_payment_cards,
         },
+
         cart_items: {
           create: cart_items,
         },

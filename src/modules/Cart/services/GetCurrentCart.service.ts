@@ -1,6 +1,7 @@
 import { AppError } from '@shared/error/AppError';
 import { plainToInstance } from 'class-transformer';
 import { inject, injectable } from 'tsyringe';
+import { Paid_status } from '@prisma/client';
 import { Cart } from '../entities/Cart';
 import { ICartRepository } from '../repositories/CartRepository.interface';
 import { IGetCurrentCartDTO } from './dto/GetCurrentCartDTO';
@@ -13,11 +14,16 @@ class GetCurrentCartService {
   ) {}
 
   public async execute({ request_id }: IGetCurrentCartDTO): Promise<Cart> {
-    const cart = await this.cartRepository.findBy({
+    let cart = await this.cartRepository.findBy({
       user_id: request_id,
       is_current: true,
     });
 
+    if (cart?.paid_status === Paid_status.PAID) {
+      cart.is_current = false;
+      await this.cartRepository.update(cart);
+      cart = null;
+    }
     if (cart) return plainToInstance(Cart, cart);
 
     const newCart = await this.cartRepository.create({
