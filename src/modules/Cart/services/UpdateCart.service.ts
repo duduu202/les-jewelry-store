@@ -72,6 +72,7 @@ class UpdateCartService {
       cart_payment_cards: [],
       created_at: cart.created_at,
       updated_at: new Date(),
+      is_current: true,
     });
     return plainToInstance(Cart, uptated_cart);
   }
