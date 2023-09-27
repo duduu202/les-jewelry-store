@@ -150,10 +150,10 @@ class CartRepository implements ICartRepository {
         cart_payment_cards: {
           create: datas.cart_payment_cards,
         },
-
         cart_items: {
           create: cart_items,
         },
+        is_current: datas.is_current,
       },
     });
     console.log('updatedCart', updatedCart);

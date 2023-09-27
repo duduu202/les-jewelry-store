@@ -52,6 +52,11 @@ class UpdateCartService {
 
     const items = foundItems.filter(item => item !== null);
 
+    if (items.length === 0) {
+      await this.cartRepository.remove(cart);
+      throw new AppError('Carrinho vazio', 400);
+    }
+
     const uptated_cart = await this.cartRepository.update({
       user_id: request_id,
       cart_items: items.map(item => ({
