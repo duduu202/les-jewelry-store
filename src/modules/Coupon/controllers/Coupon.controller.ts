@@ -2,21 +2,22 @@ import { instanceToInstance } from 'class-transformer';
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
 import { ListCouponService } from '../services/ListCoupon.service';
+import { ShowCouponService } from '../services/ShowCoupon.service';
 
 class CouponController {
-  //async show(req: Request, res: Response): Promise<Response> {
-  //  const { id } = req.params;
-  //  const { user } = req;
-  //
-  //  const showCouponService = container.resolve(ShowCouponService);
-  //
-  //  const coupon = await showCouponService.execute({
-  //    id,
-  //    request_id: user.id,
-  //  });
-  //
-  //  return res.json(coupon);
-  //}
+  async show(req: Request, res: Response): Promise<Response> {
+    const { id } = req.params;
+    const { user } = req;
+
+    const showCouponService = container.resolve(ShowCouponService);
+
+    const coupon = await showCouponService.execute({
+      id,
+      request_id: user.id,
+    });
+
+    return res.json(coupon);
+  }
 
   async index(req: Request, res: Response): Promise<Response> {
     const { page, limit, name } = req.query;

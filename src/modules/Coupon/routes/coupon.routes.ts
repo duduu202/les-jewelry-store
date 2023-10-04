@@ -12,6 +12,7 @@ const couponController = new CouponController();
 couponRouter.use(verifyToken);
 
 couponRouter.get('/', listCouponMiddleware, couponController.index);
-//couponRouter.get('/:id', showCouponMiddleware, couponController.show);
+
+couponRouter.get('/:id', showCouponMiddleware, couponController.show);
 
 export { couponRouter };
