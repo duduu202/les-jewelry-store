@@ -1,4 +1,4 @@
-import { Coupon } from '@prisma/client';
+import { Coupon, Coupon_type } from '@prisma/client';
 import { AppError } from '@shared/error/AppError';
 import { inject, injectable } from 'tsyringe';
 
@@ -26,9 +26,9 @@ class ShowCouponService {
     if (!coupon) {
       coupon = await this.couponRepository.findBy({
         code: id,
-        user_id: request_id,
       });
-      if (!coupon) {
+
+      if (!coupon || coupon.type !== Coupon_type.discount) {
         throw new AppError('Endereço não encontrado', 404);
       }
     }
