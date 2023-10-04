@@ -10,6 +10,6 @@ export const listCouponMiddleware = celebrate({
 
 export const showCouponMiddleware = celebrate({
   [Segments.PARAMS]: {
-    id: Joi.string().uuid().required(),
+    id: Joi.string().required(),
   },
 });
