@@ -1,6 +1,5 @@
 import { Coupon } from '@prisma/client';
 import { AppError } from '@shared/error/AppError';
-import { plainToInstance } from 'class-transformer';
 import { inject, injectable } from 'tsyringe';
 
 import { ICouponRepository } from '../repositories/CouponRepository.interface';
@@ -19,12 +18,20 @@ class ShowCouponService {
     id: string;
     request_id: string;
   }): Promise<Coupon> {
-    const coupon = await this.couponRepository.findBy({
-      id: id,
+    let coupon = await this.couponRepository.findBy({
+      id,
       user_id: request_id,
     });
 
-    if (!coupon) throw new AppError('Endereço não encontrado', 404);
+    if (!coupon) {
+      coupon = await this.couponRepository.findBy({
+        code: id,
+        user_id: request_id,
+      });
+      if (!coupon) {
+        throw new AppError('Endereço não encontrado', 404);
+      }
+    }
 
     return coupon;
   }
