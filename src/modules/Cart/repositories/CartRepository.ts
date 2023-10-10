@@ -135,6 +135,12 @@ class CartRepository implements ICartRepository {
       },
     });
 
+    // remove duplicated products
+    const cart_items_filtered = cart_items.filter(
+      (item, index, self) =>
+        index === self.findIndex(t => t.product_id === item.product_id),
+    );
+
     const delivery_fee = getDeliveryFee(datas.cart_items, datas.status);
     const updatedCart = await prisma.cart.update({
       where: { id },
@@ -150,12 +156,12 @@ class CartRepository implements ICartRepository {
           create: datas.cart_payment_cards,
         },
         cart_items: {
-          create: cart_items,
+          create: cart_items_filtered,
         },
         cart_coupons: {
-          create: datas.cupom_ids?.map(coupon => {
+          create: datas.cart_coupons?.map(coupon => {
             return {
-              coupon_id: coupon,
+              coupon_id: coupon.id,
             };
           }),
         },
