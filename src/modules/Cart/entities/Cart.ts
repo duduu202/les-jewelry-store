@@ -4,6 +4,7 @@ import {
   Coupon,
   Cart_status,
   Paid_status,
+  CartCoupon,
 } from '@prisma/client';
 import { PaymentCard } from '@modules/PaymentCard/entities/PaymentCard';
 import { Cart_items } from './Cart_items';
@@ -12,8 +13,6 @@ class Cart implements ICart {
   address_id: string | null;
 
   expires_at: Date | null;
-
-  cupom_id: string | null;
 
   is_current: boolean;
 
@@ -28,6 +27,8 @@ class Cart implements ICart {
   cart_items: Cart_items[];
 
   cart_payment_cards: PaymentCard[];
+
+  cart_coupons: CartCoupon[];
 
   status: Cart_status;
 

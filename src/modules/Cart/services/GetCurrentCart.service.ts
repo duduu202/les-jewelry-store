@@ -16,7 +16,7 @@ class GetCurrentCartService {
   public async execute({ request_id }: IGetCurrentCartDTO): Promise<Cart> {
     let cart = await this.cartRepository.findBy({
       user_id: request_id,
-      is_current: true,
+      paid_status: Paid_status.NOT_PAID,
     });
 
     if (cart?.paid_status === Paid_status.PAID) {

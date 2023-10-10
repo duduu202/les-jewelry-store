@@ -19,7 +19,7 @@ class CartRepository implements ICartRepository {
     const cart = await prisma.cart.findFirst({
       where: { ...filter },
       include: {
-        cupom: true,
+        cart_coupons: true,
         cart_items: {
           include: {
             product: true,
@@ -52,7 +52,7 @@ class CartRepository implements ICartRepository {
         // },
       },
       include: {
-        cupom: true,
+        cart_coupons: true,
         cart_items: {
           include: {
             product: true,
@@ -143,7 +143,6 @@ class CartRepository implements ICartRepository {
         paid_status: datas.paid_status,
         address_id: datas.address_id,
         created_at: datas.created_at,
-        cupom_id: datas.cupom_id,
         expires_at: datas.expires_at,
         status: datas.status,
         updated_at: datas.updated_at,
@@ -152,6 +151,13 @@ class CartRepository implements ICartRepository {
         },
         cart_items: {
           create: cart_items,
+        },
+        cart_coupons: {
+          create: datas.cupom_ids?.map(coupon => {
+            return {
+              coupon_id: coupon,
+            };
+          }),
         },
         is_current: datas.is_current,
       },

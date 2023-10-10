@@ -16,18 +16,19 @@ import { IPaymentCardRepository } from '@modules/PaymentCard/repositories/Paymen
 import { Product } from '@modules/Product/entities/Product';
 import { PaymentCard } from '@modules/PaymentCard/entities/PaymentCard';
 import { IAddressRepository } from '@modules/Address/repositories/AddressRepository.interface';
+import { v4 } from 'uuid';
 import { IPayCartDTO } from './dto/PayCartDTO copy';
 import { Cart } from '../entities/Cart';
 import { ICartRepository } from '../repositories/CartRepository.interface';
 
-interface ConfirmPayment {
+interface IConfirmPayment {
   cart: Cart;
   validated_cards: { payment_card: PaymentCard; percentage: number }[];
   products: { product: Product; quantity: number }[];
   total_value: number;
   cupom_id?: string;
   discount: number;
-  coupon?: Coupon;
+  coupons?: Coupon[];
   address: Address;
 }
 @injectable()
@@ -55,7 +56,7 @@ class PayCartService {
 
   public async execute({ ...cartParams }: IPayCartDTO): Promise<Cart> {
     console.log(cartParams.request_id);
-    const { payment_cards, coupon_code, request_id, cart_id } = cartParams;
+    const { payment_cards, coupon_codes, request_id, cart_id } = cartParams;
 
     const cart = await this.cartRepository.findBy({
       id: cart_id,
@@ -74,14 +75,24 @@ class PayCartService {
 
     const products = await this.checkProducts(cart);
     let discount = 0;
-    let coupon: Coupon | undefined;
+    let coupons: Coupon[] = [];
     const total_value = products.reduce((total, product) => {
       return total + product.product.price * product.quantity;
     }, 0);
 
-    if (coupon_code) {
-      coupon = await this.checkCupom(coupon_code, request_id);
-      discount += coupon.discount;
+    if (coupon_codes && coupon_codes.length > 0) {
+      // coupon = await this.checkCupom(coupon_code, request_id);
+      // discount += coupon.discount;
+
+      coupons = await Promise.all(
+        coupon_codes.map(async code => {
+          return this.checkCupom(code, request_id);
+        }),
+      );
+
+      coupons.forEach(coup => {
+        discount += coup.discount;
+      });
     }
 
     console.log('payment_cards');
@@ -97,9 +108,13 @@ class PayCartService {
       products,
       total_value,
       discount,
-      coupon,
+      coupons,
       address,
     });
+    if (cart.is_current) {
+      cart.is_current = false;
+      await this.cartRepository.update(cart);
+    }
     return plainToInstance(Cart, updated_cart);
   }
 
@@ -140,7 +155,7 @@ class PayCartService {
 
   private async checkPaymentCardSplit(
     payment_cards: { card_id: string; percentage: number }[],
-    card_value: number,
+    cart_value: number,
   ): Promise<{ payment_card: PaymentCard; percentage: number }[]> {
     if (payment_cards.length == 0)
       throw new AppError('Nenhum cartão selecionado', 400);
@@ -167,10 +182,16 @@ class PayCartService {
 
     // min 10 reais
     const min_value = 10;
-    const min_value_percentage = min_value / card_value;
+
     validated_cards.forEach(card => {
-      if (card.percentage < min_value_percentage)
-        throw new AppError('Cada cartão deve pagar no minimo 10 reais', 400);
+      const toPay = (cart_value * card.percentage) / 100;
+
+      // if (card.percentage < min_value_percentage)
+      if (toPay < min_value)
+        throw new AppError(
+          `Cada cartão deve pagar no minimo 10 reais - $${toPay.toFixed(2)}`,
+          400,
+        );
     });
 
     return validated_cards;
@@ -194,11 +215,15 @@ class PayCartService {
     return products;
   }
 
-  private async confirmPayment({ ...datas }: ConfirmPayment): Promise<Cart> {
+  private async confirmPayment({ ...datas }: IConfirmPayment): Promise<Cart> {
     datas.cart.status = Cart_status.APROVADA;
     datas.cart.paid_status = Paid_status.PAID;
-    if (datas.coupon) {
-      datas.coupon.quantity -= 1;
+    if (datas.coupons && datas.coupons.length > 0) {
+      // datas.coupon.quantity -= 1;
+
+      datas.coupons.forEach(coup => {
+        coup.quantity -= 1;
+      });
     }
     datas.total_value -= datas.discount;
     datas.total_value += datas.total_value * this.freight_value_percentage;
@@ -212,9 +237,15 @@ class PayCartService {
       throw new AppError('Pagamento não autorizado', 400);
     }
 
-    if (datas.coupon) {
-      await this.couponRepository.update(datas.coupon);
+    if (datas.coupons && datas.coupons.length > 0) {
+      // await this.couponRepository.update(datas.coupon);
+      await Promise.all(
+        datas.coupons.map(async coup => {
+          await this.couponRepository.update(coup);
+        }),
+      );
     }
+
     datas.products.forEach(async product => {
       product.product.stock -= product.quantity;
       await this.productRepository.update({
@@ -234,7 +265,16 @@ class PayCartService {
       id: datas.cart.id,
       user_id: datas.cart.user_id,
       address_id: datas.address.id,
-      cupom_id: datas.coupon ? datas.coupon.id : null,
+      cart_coupons:
+        datas.coupons?.map(coup => {
+          return {
+            id: v4(),
+            coupon_id: coup.id,
+            cart_id: datas.cart.id,
+            created_at: new Date(),
+            updated_at: new Date(),
+          };
+        }) || [],
       expires_at: datas.cart.expires_at,
       paid_status: datas.cart.paid_status,
       status: datas.cart.status,

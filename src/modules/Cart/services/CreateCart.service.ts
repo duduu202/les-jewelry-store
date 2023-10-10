@@ -47,7 +47,6 @@ class CreateCartService {
         product: item.product,
         quantity: item.quantity,
       })),
-      cupom_code,
       expires_at: new Date(Date.now() + this.time_available_in_minutes * 60000),
       is_current: true,
     });

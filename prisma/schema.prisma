@@ -105,6 +105,22 @@ model CartPaymentCard {
   @@map("cart_payment_cards")
 }
 
+model CartCoupon {
+  id String @id @default(uuid())
+
+  cart_id String? @unique
+  cart    Cart?   @relation(fields: [cart_id], references: [id])
+
+  coupon_id String?
+  coupon    Coupon? @relation(fields: [coupon_id], references: [id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@unique([cart_id, coupon_id])
+  @@map("cart_coupons")
+}
+
 model Cart {
   id      String @id @default(uuid())
   user_id String
@@ -115,8 +131,7 @@ model Cart {
   cart_items         CartItems[]
   cart_payment_cards CartPaymentCard[]
 
-  cupom_id     String?
-  cupom        Coupon?     @relation(fields: [cupom_id], references: [id])
+  cart_coupons CartCoupon[]
   status       Cart_status @default(EM_PROCESSAMENTO)
   paid_status  Paid_status @default(NOT_PAID)
   address_id   String?
@@ -124,8 +139,9 @@ model Cart {
   delivery_fee Float       @default(0)
 
   expires_at DateTime?
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
+  created_at DateTime    @default(now())
+  updated_at DateTime    @updatedAt
+
 
   @@map("carts")
 }
@@ -156,12 +172,12 @@ model Coupon {
   type Coupon_type @default(discount)
 
   code       String
-  quantity   Int       @default(1)
+  quantity   Int          @default(1)
   discount   Float
   expires_at DateTime?
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
-  Cart       Cart[]
+  created_at DateTime     @default(now())
+  updated_at DateTime     @updatedAt
+  cart_coupons CartCoupon[]
 
   @@map("coupons")
 }
