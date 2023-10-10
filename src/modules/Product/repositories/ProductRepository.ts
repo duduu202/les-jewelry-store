@@ -2,6 +2,7 @@ import { Product, Paid_status } from '@prisma/client';
 import { prisma } from '@shared/database';
 import { IPaginatedRequest } from '@shared/interfaces/IPaginatedRequest';
 import { IPaginatedResponse } from '@shared/interfaces/IPaginatedResponse';
+import { Cart } from '@modules/Cart/entities/Cart';
 import { IProductCreate } from './dto/ProductRepositoryDTO';
 import { IProductRepository } from './ProductRepository.interface';
 import { Product as EntityProduct } from '../entities/Product';
@@ -9,33 +10,33 @@ import { Product as EntityProduct } from '../entities/Product';
 class ProductRepository implements IProductRepository {
   async findBy(
     filter: Partial<Product>,
-    //include?: { [key: string]: boolean },
+    // include?: { [key: string]: boolean },
   ): Promise<EntityProduct | null> {
-    const product = await prisma.product.findFirst({
+    const product = (await prisma.product.findFirst({
       where: { ...filter },
-    });
+    })) as EntityProduct;
     if (!product) return null;
 
-    const notPaidCount = await prisma.cart.count({
-      where: {
+    const productsFil = await prisma.product.findMany({
+      include: {
         cart_items: {
-          some: {
-            product_id: product.id,
-            cart: {
-              paid_status: {
-                // not paid and not EXPIRED
-                // not: 'PAID', and not: 'EXPIRED'
-                notIn: ['PAID', 'EXPIRED'],
-              },
-            },
+          include: {
+            cart: true,
           },
         },
       },
     });
 
-    Object.assign(product, {
-      stock_available: product.stock - notPaidCount,
-    });
+    const countNotPaid = productsFil.reduce((acc, prd) => {
+      if (prd.cart_items.length === 0) return acc;
+      const notPaid = prd.cart_items.filter(
+        item => item.cart.paid_status !== 'PAID',
+      );
+
+      return acc + notPaid.reduce((acc2, item) => acc2 + item.quantity, 0);
+    }, 0);
+
+    product.stock_available = product.stock - countNotPaid;
 
     return product as EntityProduct;
   }
@@ -71,27 +72,32 @@ class ProductRepository implements IProductRepository {
     // stock means the total of products in stock
     // stock_available means the total of products in stock that are available to sell, not reserved
     // because a cart can reserve a product, but the product is still in stock
+
     const productsWithStock = await Promise.all(
       products.map(async product => {
-        const notPaidCount = await prisma.cart.count({
-          where: {
+        const productsFil = await prisma.product.findMany({
+          include: {
             cart_items: {
-              some: {
-                product_id: product.id,
-                cart: {
-                  paid_status: {
-                    not: 'PAID',
-                  },
-                },
+              include: {
+                cart: true,
               },
             },
           },
         });
 
+        const countNotPaid = productsFil.reduce((acc, prd) => {
+          if (prd.cart_items.length === 0) return acc;
+          const notPaid = prd.cart_items.filter(
+            item => item.cart.paid_status !== 'PAID',
+          );
+
+          return acc + notPaid.reduce((acc2, item) => acc2 + item.quantity, 0);
+        }, 0);
+
         return {
           ...product,
           stock: product.stock,
-          stock_available: product.stock - notPaidCount,
+          stock_available: product.stock - countNotPaid,
         };
       }),
     );
