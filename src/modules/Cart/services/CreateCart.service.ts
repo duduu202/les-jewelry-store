@@ -29,7 +29,7 @@ class CreateCartService {
     if (cart_items.length === 0) throw new AppError('Carrinho vazio', 400);
 
     const items = await Promise.all(
-      cart_items.map(async item => {
+      cart_items?.map(async item => {
         const product = await this.productRepository.findBy({
           id: item.product_id,
         });
@@ -43,7 +43,7 @@ class CreateCartService {
 
     const cart = await this.cartRepository.create({
       user_id: cartParams.request_id,
-      cart_items: items.map(item => ({
+      cart_items: items?.map(item => ({
         product: item.product,
         quantity: item.quantity,
       })),

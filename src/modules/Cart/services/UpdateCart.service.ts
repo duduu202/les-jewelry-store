@@ -59,7 +59,7 @@ class UpdateCartService {
 
     const uptated_cart = await this.cartRepository.update({
       user_id: request_id,
-      cart_items: items.map(item => ({
+      cart_items: items?.map(item => ({
         product: item!.product,
         quantity: item!.quantity,
         cart_id: id,
@@ -70,9 +70,10 @@ class UpdateCartService {
       })),
       expires_at: new Date(Date.now() + this.time_available_in_minutes * 60000),
       address_id: null,
-      cupom_id: null,
       paid_status: cart.paid_status,
       status: cart.status,
+      cart_coupons: [],
+      delivery_fee: cart.delivery_fee,
       id,
       cart_payment_cards: [],
       created_at: cart.created_at,
