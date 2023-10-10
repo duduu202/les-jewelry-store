@@ -52,22 +52,18 @@ class UpdateCartService {
 
     const items = foundItems.filter(item => item !== null);
 
-    if (items.length === 0) {
-      await this.cartRepository.remove(cart);
-      throw new AppError('Carrinho vazio', 400);
-    }
-
     const uptated_cart = await this.cartRepository.update({
       user_id: request_id,
-      cart_items: items?.map(item => ({
-        product: item!.product,
-        quantity: item!.quantity,
-        cart_id: id,
-        created_at: new Date(),
-        updated_at: new Date(),
-        product_id: item!.product.id,
-        id: v4(),
-      })),
+      cart_items:
+        items?.map(item => ({
+          product: item!.product,
+          quantity: item!.quantity,
+          cart_id: id,
+          created_at: new Date(),
+          updated_at: new Date(),
+          product_id: item!.product.id,
+          id: v4(),
+        })) || [],
       expires_at: new Date(Date.now() + this.time_available_in_minutes * 60000),
       address_id: null,
       paid_status: cart.paid_status,
