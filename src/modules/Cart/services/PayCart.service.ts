@@ -270,7 +270,6 @@ class PayCartService {
           return {
             id: v4(),
             coupon_id: coup.id,
-            cart_id: datas.cart.id,
             created_at: new Date(),
             updated_at: new Date(),
           };

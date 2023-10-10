@@ -135,6 +135,12 @@ class CartRepository implements ICartRepository {
       },
     });
 
+    await prisma.cartCoupon.deleteMany({
+      where: {
+        cart_id: id,
+      },
+    });
+
     // remove duplicated products
     const cart_items_filtered = cart_items.filter(
       (item, index, self) =>
@@ -159,11 +165,7 @@ class CartRepository implements ICartRepository {
           create: cart_items_filtered,
         },
         cart_coupons: {
-          create: datas.cart_coupons?.map(coupon => {
-            return {
-              coupon_id: coupon.id,
-            };
-          }),
+          create: datas.cart_coupons,
         },
         is_current: datas.is_current,
       },
