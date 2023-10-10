@@ -141,7 +141,7 @@ class PayCartService {
     user_id: string,
   ): Promise<Coupon> {
     const coupon = await this.couponRepository.findBy({
-      code: coupon_code,
+      id: coupon_code,
     });
     if (!coupon) throw new AppError('Cupom não encontrado', 404);
     if (coupon.type == Coupon_type.exchange && user_id != coupon.user_id) {
