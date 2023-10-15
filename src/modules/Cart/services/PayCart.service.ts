@@ -122,6 +122,7 @@ class PayCartService {
     if (cart.expires_at && new Date(cart.expires_at) < new Date()) {
       cart.status = Cart_status.REPROVADA;
       cart.paid_status = Paid_status.EXPIRED;
+      await this.cartRepository.remove(cart);
       throw new AppError('Carrinho expirado', 400);
     }
     if (cart.paid_status == Paid_status.PAID) {

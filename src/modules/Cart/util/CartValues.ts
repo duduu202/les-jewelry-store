@@ -17,7 +17,18 @@ export function sumTotalPrice(
   cart.cart_items.forEach(item => {
     total += item.product.price * item.quantity;
   });
-  if (include_coupon) total -= cart.cupom?.discount || 0;
+  if (include_coupon) {
+    // old
+    // total -= cart.cupom?.discount || 0;
+
+    // new
+    total -= cart.cart_coupons.reduce((acc, coupon) => {
+      if (coupon.coupon) {
+        return acc + coupon.coupon.discount;
+      }
+      return acc;
+    }, 0);
+  }
   if (include_delivery) {
     total += cart.delivery_fee;
   }
@@ -26,7 +37,14 @@ export function sumTotalPrice(
 }
 export function getTotalDiscount(cart: Cart): number {
   let total = 0;
-  total += cart.cupom?.discount || 0;
+  // total += cart.cupom?.discount || 0;
+
+  total += cart.cart_coupons.reduce((acc, coupon) => {
+    if (coupon.coupon) {
+      return acc + coupon.coupon.discount;
+    }
+    return acc;
+  }, 0);
 
   return Math.round(total * 100) / 100;
 }

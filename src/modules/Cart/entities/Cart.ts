@@ -4,10 +4,10 @@ import {
   Coupon,
   Cart_status,
   Paid_status,
-  CartCoupon,
 } from '@prisma/client';
 import { PaymentCard } from '@modules/PaymentCard/entities/PaymentCard';
 import { Cart_items } from './Cart_items';
+import { CartCoupon } from './CartCoupon';
 
 class Cart implements ICart {
   address_id: string | null;
@@ -15,8 +15,6 @@ class Cart implements ICart {
   expires_at: Date | null;
 
   is_current: boolean;
-
-  cupom: Coupon;
 
   paid_status: Paid_status;
 
