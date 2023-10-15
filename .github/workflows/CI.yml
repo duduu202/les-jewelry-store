@@ -63,6 +63,6 @@ jobs:
             pwd
             echo $USER
             echo $PATH
-            yarn
+            npx
             ./node_modules/.bin/prisma migrate dev
             pm2 restart les-jewelry-store
