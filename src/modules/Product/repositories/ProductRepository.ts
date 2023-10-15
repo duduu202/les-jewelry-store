@@ -47,6 +47,7 @@ class ProductRepository implements IProductRepository {
     filters,
     search,
   }: IPaginatedRequest<Product>): Promise<IPaginatedResponse<EntityProduct>> {
+    console.time('listByData');
     const products = await prisma.product.findMany({
       where: filters && {
         ...filters,
@@ -55,11 +56,19 @@ class ProductRepository implements IProductRepository {
           mode: 'insensitive',
         },
       },
+      include: {
+        cart_items: {
+          include: {
+            cart: true,
+          },
+        },
+      },
       skip: (page - 1) * limit,
       take: limit,
     });
+    console.timeEnd('listByData');
 
-    const productTotal = await prisma.product.count({
+    const productTotal = prisma.product.count({
       where: filters && {
         ...filters,
         name: {
@@ -73,38 +82,44 @@ class ProductRepository implements IProductRepository {
     // stock_available means the total of products in stock that are available to sell, not reserved
     // because a cart can reserve a product, but the product is still in stock
 
-    const productsWithStock = await Promise.all(
-      products.map(async product => {
-        const productsFil = await prisma.product.findMany({
-          include: {
-            cart_items: {
-              include: {
-                cart: true,
-              },
-            },
-          },
-        });
+    const productsWithStock = products.map(product => {
+      // const productsFil = await prisma.product.findMany({
+      //  include: {
+      //    cart_items: {
+      //      include: {
+      //        cart: true,
+      //      },
+      //    },
+      //  },
+      //  where: {
+      //    id: product.id,
+      //  },
+      // });
 
-        const countNotPaid = productsFil.reduce((acc, prd) => {
-          if (prd.cart_items.length === 0) return acc;
-          const notPaid = prd.cart_items.filter(
-            item => item.cart.paid_status !== 'PAID',
-          );
+      // const countNotPaid = productsFil.reduce((acc, prd) => {
+      //  if (prd.cart_items.length === 0) return acc;
+      //  const notPaid = prd.cart_items.filter(
+      //    item => item.cart.paid_status !== Paid_status.PAID,
+      //  );
+      //
+      //  return acc + notPaid.reduce((acc2, item) => acc2 + item.quantity, 0);
+      // }, 0);
 
-          return acc + notPaid.reduce((acc2, item) => acc2 + item.quantity, 0);
-        }, 0);
+      const countNotPaid = product.cart_items.reduce((acc, item) => {
+        if (item.cart.paid_status === Paid_status.PAID) return acc;
+        return acc + item.quantity;
+      }, 0);
 
-        return {
-          ...product,
-          stock: product.stock,
-          stock_available: product.stock - countNotPaid,
-        };
-      }),
-    );
+      return {
+        ...product,
+        stock: product.stock,
+        stock_available: product.stock - countNotPaid,
+      };
+    });
 
     return {
       results: productsWithStock as EntityProduct[],
-      total: productTotal,
+      total: await productTotal,
       page,
       limit,
     };
