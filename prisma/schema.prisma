@@ -137,11 +137,11 @@ model Cart {
   address_id   String?
   address      Address?    @relation(fields: [address_id], references: [id])
   delivery_fee Float       @default(0)
+    is_default Boolean @default(false)
 
   expires_at DateTime?
   created_at DateTime    @default(now())
   updated_at DateTime    @updatedAt
-
 
   @@map("carts")
 }
