@@ -26,8 +26,10 @@ class GetCurrentCartService {
     }
 
     if (cart) {
-      cart.is_current = true;
-      this.cartRepository.update(cart);
+      if (!cart.is_current) {
+        cart.is_current = true;
+        this.cartRepository.update(cart);
+      }
       return plainToInstance(Cart, cart);
     }
 

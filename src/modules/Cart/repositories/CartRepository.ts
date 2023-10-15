@@ -124,23 +124,29 @@ class CartRepository implements ICartRepository {
       };
     });
 
-    await prisma.cartPaymentCard.deleteMany({
-      where: {
-        cart_id: id,
-      },
-    });
-    await prisma.cartItems.deleteMany({
-      where: {
-        cart_id: id,
-      },
-    });
+    if (datas.cart_payment_cards) {
+      await prisma.cartPaymentCard.deleteMany({
+        where: {
+          cart_id: id,
+        },
+      });
+    }
 
-    await prisma.cartCoupon.deleteMany({
-      where: {
-        cart_id: id,
-      },
-    });
+    if (datas.cart_items) {
+      await prisma.cartItems.deleteMany({
+        where: {
+          cart_id: id,
+        },
+      });
+    }
 
+    if (datas.cart_coupons) {
+      await prisma.cartCoupon.deleteMany({
+        where: {
+          cart_id: id,
+        },
+      });
+    }
     // remove duplicated products
     const cart_items_filtered = cart_items.filter(
       (item, index, self) =>
@@ -158,15 +164,22 @@ class CartRepository implements ICartRepository {
         expires_at: datas.expires_at,
         status: datas.status,
         updated_at: datas.updated_at,
-        cart_payment_cards: {
-          create: datas.cart_payment_cards,
-        },
-        cart_items: {
-          create: cart_items_filtered,
-        },
-        cart_coupons: {
-          create: datas.cart_coupons,
-        },
+        cart_payment_cards: datas.cart_payment_cards
+          ? {
+              create: datas.cart_payment_cards,
+            }
+          : undefined,
+        cart_items: cart_items_filtered
+          ? {
+              create: cart_items_filtered,
+            }
+          : undefined,
+        cart_coupons: datas.cart_coupons
+          ? {
+              create: datas.cart_coupons,
+            }
+          : undefined,
+
         is_current: datas.is_current,
       },
     });

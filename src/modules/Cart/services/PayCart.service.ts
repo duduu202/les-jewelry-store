@@ -111,10 +111,7 @@ class PayCartService {
       coupons,
       address,
     });
-    if (cart.is_current) {
-      cart.is_current = false;
-      await this.cartRepository.update(cart);
-    }
+
     return plainToInstance(Cart, updated_cart);
   }
 
