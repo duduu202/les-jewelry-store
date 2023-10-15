@@ -24,7 +24,12 @@ class GetCurrentCartService {
       await this.cartRepository.update(cart);
       cart = null;
     }
-    if (cart) return plainToInstance(Cart, cart);
+
+    if (cart) {
+      cart.is_current = true;
+      this.cartRepository.update(cart);
+      return plainToInstance(Cart, cart);
+    }
 
     const newCart = await this.cartRepository.create({
       user_id: request_id,
