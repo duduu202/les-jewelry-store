@@ -194,7 +194,7 @@ class PayCartService {
         if (!payment_card) throw new AppError('Cartão não encontrado', 404);
         return { payment_card, percentage: card.percentage };
       }),
-    );
+    ) || [];
 
     const total_percentage = validated_cards.reduce(
       (total, card) => total + card.percentage,
@@ -256,7 +256,7 @@ class PayCartService {
     total_value -= datas.discount;
 
     if(total_value > 0){
-      if(datas?.validated_cards.length <= 0){
+      if(datas?.validated_cards?.length <= 0){
         throw new AppError('Faltam '+total_value+' para completar o pagamento. Selecione um cartão', 400);
       }
       const validated_cards = await this.checkPaymentCardSplit(
