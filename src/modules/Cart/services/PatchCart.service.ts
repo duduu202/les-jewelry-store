@@ -4,10 +4,10 @@ import { plainToInstance } from 'class-transformer';
 import { inject, injectable } from 'tsyringe';
 import { IUserRepository } from '@modules/User/repositories/UserRepository.interface';
 import { Cart_status, Coupon_type, Paid_status } from '@prisma/client';
+import { ICouponRepository } from '@modules/Coupon/repositories/CouponRepository.interface';
 import { Cart } from '../entities/Cart';
 import { ICartRepository } from '../repositories/CartRepository.interface';
 import { IPatchCartDTO } from './dto/PatchCartDTO';
-import { ICouponRepository } from '@modules/Coupon/repositories/CouponRepository.interface';
 
 @injectable()
 class PatchCartService {
@@ -54,7 +54,7 @@ class PatchCartService {
     }
 
     cart.status = status;
-    this.cartRepository.update(cart);
+    this.cartRepository.updateStatus(cart);
 
     return plainToInstance(Cart, cart);
   }
@@ -65,7 +65,7 @@ class PatchCartService {
     }, 0);
     const coupon = this.couponRepository.create({
       user_id: cart.user_id,
-      code: 'TROCA-' + value.toFixed(2),
+      code: `TROCA-${value.toFixed(2)}`,
       discount: value,
       type: Coupon_type.exchange,
     });

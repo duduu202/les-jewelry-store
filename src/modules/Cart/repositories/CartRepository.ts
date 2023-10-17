@@ -188,6 +188,17 @@ class CartRepository implements ICartRepository {
     return updatedCart as EntityCart;
   }
 
+  async updateStatus({ id, ...datas }: ICartUpdate): Promise<EntityCart> {
+    const updatedCart = await prisma.cart.update({
+      where: { id },
+      data: {
+        status: datas.status,
+      },
+    });
+
+    return updatedCart;
+  }
+
   async remove(cart: Cart): Promise<void> {
     await prisma.cart.delete({
       where: { id: cart.id },
