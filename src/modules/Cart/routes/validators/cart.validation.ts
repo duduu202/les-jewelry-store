@@ -29,8 +29,9 @@ export const payCartMiddleware = celebrate({
         }),
       )
       //.min(1),
-      .default([]),
-      .required(),
+      //.default([]),
+      .empty([]),
+      //.required(),
     coupon_codes: Joi.array().items(Joi.string()),
     address_id: Joi.string().uuid().required(),
   },

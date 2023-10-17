@@ -187,8 +187,8 @@ class PayCartService {
     payment_cards: { card_id: string; percentage: number }[],
     cart_value: number,
   ): Promise<{ payment_card: PaymentCard; percentage: number }[]> {
-    if (payment_cards.length == 0)
-      throw new AppError('Nenhum cartão selecionado', 400);
+    // if (payment_cards.length == 0)
+    //   throw new AppError('Nenhum cartão selecionado', 400);
 
     const validated_cards = await Promise.all(
       payment_cards.map(async card => {
@@ -256,13 +256,21 @@ class PayCartService {
       });
     }
 
-    try {
-      // TODO Payment Gateway Request
-      // ...
-    } catch (err) {
-      datas.cart.status = Cart_status.REPROVADA;
-      datas.cart.paid_status = Paid_status.NOT_PAID;
-      throw new AppError('Pagamento não autorizado', 400);
+    let total_value = datas.total_value + datas.total_value * this.freight_value_percentage;
+    total_value -= datas.discount;
+
+    if(total_value > 0){
+      if(datas?.validated_cards.length <= 0){
+        throw new AppError('Faltam '+total_value+' para completar o pagamento. Selecione um cartão', 400);
+      }
+      try {
+        // TODO Payment Gateway Request
+        // ...
+      } catch (err) {
+        datas.cart.status = Cart_status.REPROVADA;
+        datas.cart.paid_status = Paid_status.NOT_PAID;
+        throw new AppError('Pagamento não autorizado', 400);
+      }
     }
 
     if (datas.coupons && datas.coupons.length > 0) {
