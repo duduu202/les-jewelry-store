@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { uploadMulter } from '@config/upload';
 import { verifyToken } from '@shared/middleware/verifyToken';
+import verifyAuthorization from '@shared/middleware/verifyAuthorization';
+import { UserRole } from '@prisma/client';
 import {
   createProductMiddleware,
   deleteProductMiddleware,
@@ -10,8 +12,6 @@ import {
   updateProductMiddleware,
 } from './validators/product.validation';
 import { ProductController } from '../controllers/Product.controller';
-import verifyAuthorization from '@shared/middleware/verifyAuthorization';
-import { UserRole } from '@prisma/client';
 
 const productRouter = Router();
 const productController = new ProductController();

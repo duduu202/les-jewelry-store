@@ -33,7 +33,9 @@ interface IConfirmPayment {
 }
 @injectable()
 class PayCartService {
-  freight_value_percentage = 0.1;
+  freight_value_percentage =
+    (Number(process.env.FREIGHT_VALUE_PERCENTAGE) || 0) / 100;
+  // 0.1;
 
   constructor(
     @inject('CartRepository')
@@ -102,6 +104,16 @@ class PayCartService {
       total_value,
     );
 
+    this.checkUnnecessaryCupons({
+      cart,
+      validated_cards,
+      products,
+      total_value,
+      discount,
+      coupons,
+      address,
+    });
+
     const updated_cart = await this.confirmPayment({
       cart,
       validated_cards,
@@ -113,6 +125,23 @@ class PayCartService {
     });
 
     return plainToInstance(Cart, updated_cart);
+  }
+
+  private async checkUnnecessaryCupons(datas: IConfirmPayment): Promise<void> {
+    let total_discount = 0;
+    const total =
+      datas.total_value + datas.total_value * this.freight_value_percentage;
+    let beyond = false;
+
+    datas.coupons?.forEach(coup => {
+      total_discount += coup.discount;
+      if (total_discount > total) {
+        if (beyond) {
+          throw new AppError('Cupons desnecessários', 400);
+        }
+        beyond = true;
+      }
+    });
   }
 
   private async checkCart(cart: Cart): Promise<void> {
@@ -223,8 +252,6 @@ class PayCartService {
         coup.quantity -= 1;
       });
     }
-    datas.total_value -= datas.discount;
-    datas.total_value += datas.total_value * this.freight_value_percentage;
 
     try {
       // TODO Payment Gateway Request
@@ -281,7 +308,29 @@ class PayCartService {
       is_current: false,
     });
 
+    await this.generateCouponWhenNegative(datas);
+
     return cart;
+  }
+
+  private async generateCouponWhenNegative(
+    datas: IConfirmPayment,
+  ): Promise<Coupon | undefined> {
+    datas.total_value += datas.total_value * this.freight_value_percentage;
+    datas.total_value -= datas.discount;
+    if (datas.total_value < 0) {
+      const discount = datas.total_value * -1;
+      const coupon = await this.couponRepository.create({
+        code: `DESCONTO-${discount.toFixed(2)}`,
+        discount,
+        type: Coupon_type.discount,
+        user_id: datas.cart.user_id,
+      });
+
+      return coupon;
+    }
+
+    return undefined;
   }
 }
 

@@ -4,9 +4,11 @@ import { inject, injectable } from 'tsyringe';
 import { plainToInstance } from 'class-transformer';
 import { IProductRepository } from '@modules/Product/repositories/ProductRepository.interface';
 import { v4 } from 'uuid';
+import { Product } from '@modules/Product/entities/Product';
 import { ICartRepository } from '../repositories/CartRepository.interface';
 import { IUpdateCartDTO } from './dto/UpdateCartDTO';
 import { Cart } from '../entities/Cart';
+import { getDeliveryFee } from '../util/CartValues';
 
 @injectable()
 class UpdateCartService {
@@ -50,7 +52,10 @@ class UpdateCartService {
       }),
     );
 
-    const items = foundItems.filter(item => item !== null);
+    const items = foundItems.filter(item => item !== null) as {
+      product: Product;
+      quantity: number;
+    }[];
 
     const uptated_cart = await this.cartRepository.update({
       user_id: request_id,
@@ -69,7 +74,16 @@ class UpdateCartService {
       paid_status: cart.paid_status,
       status: cart.status,
       cart_coupons: [],
-      delivery_fee: cart.delivery_fee,
+      delivery_fee: items
+        ? getDeliveryFee(
+            items.map(i => {
+              return {
+                product: i.product,
+                quantity: i.quantity,
+              };
+            }),
+          )
+        : 0,
       id,
       cart_payment_cards: [],
       created_at: cart.created_at,

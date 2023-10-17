@@ -117,7 +117,7 @@ model CartCoupon {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  @@unique([cart_id, coupon_id])
+  //@@unique([cart_id, coupon_id])
   @@map("cart_coupons")
 }
 

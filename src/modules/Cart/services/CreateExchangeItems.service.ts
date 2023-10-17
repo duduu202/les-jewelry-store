@@ -12,14 +12,15 @@ import { ICreateExchangeItemsDTO } from './dto/ICreateExchangeItemsDTO';
 class CreateExchangeItemsService {
   // never expire
   time_available_in_minutes = 60 * 24 * 365 * 100;
+
   constructor(
     @inject('CartRepository')
     private cartRepository: ICartRepository,
 
     @inject('ProductRepository')
-    private productRepository: IProductRepository, //time_available_in_minutes = 30,
+    private productRepository: IProductRepository, // time_available_in_minutes = 30,
   ) {
-    //this.time_available_in_minutes = time_available_in_minutes;
+    // this.time_available_in_minutes = time_available_in_minutes;
   }
 
   public async execute({
@@ -52,10 +53,10 @@ class CreateExchangeItemsService {
       }),
     );
 
-    //const itemsNotExchanged = cart.cart_items.filter(
+    // const itemsNotExchanged = cart.cart_items.filter(
     //  cartItem =>
     //    !exchangedItems.find(item => item.product.id === cartItem.product_id),
-    //);
+    // );
 
     const exchangeCart = await this.cartRepository.create({
       user_id: request_id,

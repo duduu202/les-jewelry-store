@@ -28,8 +28,8 @@ class ShowCouponService {
         code: id,
       });
 
-      if (!coupon || coupon.type !== Coupon_type.discount) {
-        throw new AppError('Endereço não encontrado', 404);
+      if (!coupon) {
+        throw new AppError('Cupom não encontrado', 404);
       }
     }
 
