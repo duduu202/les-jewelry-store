@@ -35,7 +35,7 @@ class CartController {
 
     const Cart = await payCartService.execute({
       cart_id: id,
-      payment_cards,
+      payment_cards: payment_cards || [],
       request_id: user.id,
       coupon_codes,
       address_id,
