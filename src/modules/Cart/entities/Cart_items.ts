@@ -5,11 +5,17 @@ import { Product } from '@modules/Product/entities/Product';
 
 class Cart_items implements ICart_items {
   id: string;
+
   cart_id: string;
+
   product_id: string;
+
   product: Product;
+
   quantity: number;
+
   created_at: Date;
+
   updated_at: Date;
 }
 
