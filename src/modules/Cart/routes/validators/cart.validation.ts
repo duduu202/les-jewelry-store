@@ -28,7 +28,8 @@ export const payCartMiddleware = celebrate({
           percentage: Joi.number().min(1).max(100).required(),
         }),
       )
-      .min(1)
+      //.min(1),
+      .default([]),
       .required(),
     coupon_codes: Joi.array().items(Joi.string()),
     address_id: Joi.string().uuid().required(),
