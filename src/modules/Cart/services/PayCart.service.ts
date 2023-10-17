@@ -127,7 +127,7 @@ class PayCartService {
     return plainToInstance(Cart, updated_cart);
   }
 
-  private async checkUnnecessaryCupons(datas: IConfirmPayment): Promise<void> {
+  private checkUnnecessaryCupons(datas: IConfirmPayment): void {
     let total_discount = 0;
     const total =
       datas.total_value + datas.total_value * this.freight_value_percentage;
@@ -137,7 +137,10 @@ class PayCartService {
       total_discount += coup.discount;
       if (total_discount > total) {
         if (beyond) {
-          throw new AppError('Cupons desnecessários', 400);
+          throw new AppError(
+            'Cupons desnecessários, retire um ou mais cupons',
+            400,
+          );
         }
         beyond = true;
       }
