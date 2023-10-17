@@ -19,7 +19,12 @@ class CartRepository implements ICartRepository {
     const cart = await prisma.cart.findFirst({
       where: { ...filter },
       include: {
-        cart_coupons: true,
+        //cart_coupons: true,
+        cart_coupons: {
+          include: {
+            coupon: true,
+          },
+        },
         cart_items: {
           include: {
             product: true,
@@ -52,8 +57,14 @@ class CartRepository implements ICartRepository {
         // },
       },
       include: {
-        cart_coupons: true,
-        cart_items: {
+        // cart_coupons: true,
+        
+      cart_coupons: {
+          include: {
+            coupon: true,
+          },
+        },
+      cart_items: {
           include: {
             product: true,
           },
