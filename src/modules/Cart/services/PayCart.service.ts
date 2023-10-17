@@ -99,10 +99,6 @@ class PayCartService {
 
     console.log('payment_cards');
     console.log(payment_cards);
-    const validated_cards = await this.checkPaymentCardSplit(
-      payment_cards,
-      total_value + total_value * this.freight_value_percentage,
-    );
 
     this.checkUnnecessaryCupons({
       cart,
@@ -263,6 +259,15 @@ class PayCartService {
       if(datas?.validated_cards.length <= 0){
         throw new AppError('Faltam '+total_value+' para completar o pagamento. Selecione um cartão', 400);
       }
+      const validated_cards = await this.checkPaymentCardSplit(
+        datas.validated_cards.map(card => {
+          return {
+            card_id: card.payment_card.id,
+            percentage: card.percentage,
+          }
+        }),
+        datas.total_value + datas.total_value * this.freight_value_percentage,
+      );
       try {
         // TODO Payment Gateway Request
         // ...
