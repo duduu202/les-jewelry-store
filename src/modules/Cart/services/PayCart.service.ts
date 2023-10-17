@@ -101,7 +101,7 @@ class PayCartService {
     console.log(payment_cards);
     const validated_cards = await this.checkPaymentCardSplit(
       payment_cards,
-      total_value,
+      total_value + total_value * this.freight_value_percentage,
     );
 
     this.checkUnnecessaryCupons({
