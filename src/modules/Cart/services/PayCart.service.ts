@@ -112,7 +112,7 @@ class PayCartService {
 
     const updated_cart = await this.confirmPayment({
       cart,
-      validated_cards,
+      validated_cards: validated_cards || [],
       products,
       total_value,
       discount,
@@ -260,7 +260,7 @@ class PayCartService {
         throw new AppError('Faltam '+total_value+' para completar o pagamento. Selecione um cartão', 400);
       }
       const validated_cards = await this.checkPaymentCardSplit(
-        datas.validated_cards.map(card => {
+        datas?.validated_cards?.map(card => {
           return {
             card_id: card.payment_card.id,
             percentage: card.percentage,
