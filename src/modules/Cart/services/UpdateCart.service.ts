@@ -46,7 +46,7 @@ class UpdateCartService {
           id: item.product_id,
         });
         if (!product) throw new AppError('Produto não encontrado', 404);
-        if (product.stock_available < item.quantity)
+        if (product.stock <= item.quantity)
           throw new AppError('Quantidade indisponível', 400);
         return { product, quantity: item.quantity };
       }),
