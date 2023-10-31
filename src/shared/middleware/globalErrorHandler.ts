@@ -151,6 +151,6 @@ export async function globalErrorHandler(
 
   return response.status(500).json({
     status: 'error',
-    message: 'Server error',
+    message: 'Error'+JSON.stringify(err),
   });
 }
