@@ -137,6 +137,9 @@ class PayCartService {
     const total =
       datas.total_value + datas.total_value * this.freight_value_percentage;
     let beyond = false;
+     if(!datas.coupons || datas.coupons.lenght <= 0){
+    return;
+}
 
     datas.coupons?.forEach(coup => {
       total_discount += coup.discount;
