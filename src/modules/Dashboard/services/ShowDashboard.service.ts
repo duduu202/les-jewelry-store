@@ -29,12 +29,14 @@ class ShowDashboardService {
   }: IShowDashboardDTO): Promise<IDashboard> {
     const orders = await this.cartRepository.listBy({
       filters: {
-        paid_status: Paid_status.PAID,
+        // paid or refunded
+        paid_status: {
+          in: [Paid_status.PAID, Paid_status.REFUNDED],
+        },
       },
       customFilters: {
         start_date,
         end_date,
-        categories,
       },
       include: {
         user: true,

@@ -46,11 +46,16 @@ class CartRepository implements ICartRepository {
     page,
     limit,
     filters,
+    customFilters: { start_date, end_date },
   }: // search,
   IPaginatedRequest<Cart>): Promise<IPaginatedResponse<EntityCart>> {
     const carts = await prisma.cart.findMany({
       where: filters && {
         ...filters,
+        updated_at: {
+          gte: start_date,
+          lte: end_date,
+        },
         // name: {
         //  contains: search,
         //  mode: 'insensitive',
