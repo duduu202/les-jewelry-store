@@ -15,7 +15,14 @@ model User {
   id String @id @default(uuid())
 
   payment_card PaymentCard[]
-  address      Address[]
+  address      Address[] @relation("UserAddress")
+
+  charge_address_id String?
+  charge_address Address? @relation("UserChargeAddress", fields: [charge_address_id], references: [id], onDelete: Cascade)
+  delivery_address_id String?
+  delivery_address Address? @relation("UserDeliveryAddress", fields: [delivery_address_id], references: [id], onDelete: Cascade)
+  
+
   //coupon     Coupon?
   //order     Order?
 
@@ -37,7 +44,11 @@ model Address {
   id String @id @default(uuid())
 
   user_id String
-  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user    User   @relation("UserAddress", fields: [user_id], references: [id], onDelete: Cascade)
+  user_charge_address User[] @relation("UserChargeAddress")
+  user_delivery_address User[] @relation("UserDeliveryAddress")
+
+
   cart    Cart[]
 
   street   String
@@ -61,6 +72,7 @@ model Product {
   name        String
   description String
   image       String?
+  categories  Category[]
 
   cart_items CartItems[]
 
@@ -70,6 +82,11 @@ model Product {
   @@map("products")
 }
 
+model Category {
+  name        String @id
+  products    Product[]
+  @@map("categories")
+}
 // many products to many carts
 model CartItems {
   id String @id @default(uuid())
