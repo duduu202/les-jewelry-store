@@ -52,10 +52,13 @@ class CartRepository implements ICartRepository {
     const carts = await prisma.cart.findMany({
       where: filters && {
         ...filters,
-        updated_at: {
-          gte: start_date,
-          lte: end_date,
-        },
+        updated_at:
+          start_date && end_date
+            ? {
+                gte: start_date,
+                lte: end_date,
+              }
+            : undefined,
         // name: {
         //  contains: search,
         //  mode: 'insensitive',
