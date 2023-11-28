@@ -103,10 +103,10 @@ class PayCartService {
     const validated_cards = await this.checkPaymentCard(
       payment_cards?.map(card => {
         return {
-          card_id: card.payment_card.id,
+          card_id: card.payment_card_id,
           percentage: card.percentage,
-        }
-      })
+        };
+      }),
     );
 
     this.checkUnnecessaryCupons({
@@ -210,7 +210,10 @@ class PayCartService {
     return validated_cards || [];
   }
 
-  private async checkCardSplit(validated_cards: { payment_card: PaymentCard; percentage: number }[], cart_value: number){
+  private async checkCardSplit(
+    validated_cards: { payment_card: PaymentCard; percentage: number }[],
+    cart_value: number,
+  ) {
     const total_percentage = validated_cards.reduce(
       (total, card) => total + card.percentage,
       0,
@@ -263,17 +266,23 @@ class PayCartService {
       datas.coupons.forEach(coup => {
         coup.quantity -= 1;
       });
-    }
-    else{
-      this.checkCardSplit(datas.validated_cards, datas.total_value + datas.total_value * this.freight_value_percentage);
+    } else {
+      this.checkCardSplit(
+        datas.validated_cards,
+        datas.total_value + datas.total_value * this.freight_value_percentage,
+      );
     }
 
-    let total_value = datas.total_value + datas.total_value * this.freight_value_percentage;
+    let total_value =
+      datas.total_value + datas.total_value * this.freight_value_percentage;
     total_value -= datas.discount;
 
-    if(total_value > 0){
-      if(datas?.validated_cards?.length <= 0){
-        throw new AppError('Faltam '+total_value+' para completar o pagamento. Selecione um cartão', 400);
+    if (total_value > 0) {
+      if (datas?.validated_cards?.length <= 0) {
+        throw new AppError(
+          `Faltam ${total_value} para completar o pagamento. Selecione um cartão`,
+          400,
+        );
       }
       try {
         // TODO Payment Gateway Request

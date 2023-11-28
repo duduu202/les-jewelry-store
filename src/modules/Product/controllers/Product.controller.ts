@@ -4,16 +4,17 @@ import { Request, Response } from 'express';
 import { container } from 'tsyringe';
 import { CreateProductService } from '../services/CreateProduct.service';
 import { DeleteProductService } from '../services/DeleteProduct.service';
+import { ListCategoryService } from '../services/ListCategories.service';
 import { ListProductService } from '../services/ListProduct.service';
 import { ShowProductService } from '../services/ShowProduct.service';
 import { UpdateProductService } from '../services/UpdateProduct.service';
 
 class ProductController {
   async create(req: Request, res: Response): Promise<Response> {
-    const { price, stock, name, description } = req.body;
-    //if (!req.file) {
+    const { price, stock, name, description, categories } = req.body;
+    // if (!req.file) {
     //  throw new AppError('Nenhum arquivo enviado', 400);
-    //}
+    // }
 
     const createProductService = container.resolve(CreateProductService);
 
@@ -23,6 +24,7 @@ class ProductController {
       name,
       description,
       image: req.file?.filename,
+      categories,
     });
 
     return res.status(201).json(instanceToInstance(Product));
@@ -58,6 +60,14 @@ class ProductController {
     });
 
     return res.json(instanceToInstance(Products));
+  }
+
+  async indexCategories(req: Request, res: Response): Promise<Response> {
+    const listCategoryService = container.resolve(ListCategoryService);
+
+    const categories = await listCategoryService.execute();
+
+    return res.json(instanceToInstance(categories));
   }
 
   async update(req: Request, res: Response): Promise<Response> {

@@ -3,7 +3,7 @@ import { prisma } from '@shared/database';
 import { IPaginatedRequest } from '@shared/interfaces/IPaginatedRequest';
 import { IPaginatedResponse } from '@shared/interfaces/IPaginatedResponse';
 import { Cart } from '@modules/Cart/entities/Cart';
-import { IProductCreate } from './dto/ProductRepositoryDTO';
+import { IProductCreate, IProductUpdate } from './dto/ProductRepositoryDTO';
 import { IProductRepository } from './ProductRepository.interface';
 import { Product as EntityProduct } from '../entities/Product';
 
@@ -42,12 +42,11 @@ class ProductRepository implements IProductRepository {
   }
 
   public async listBy({
-    page = 1,
-    limit = 10,
+    page = undefined,
+    limit = undefined,
     filters,
     search,
   }: IPaginatedRequest<Product>): Promise<IPaginatedResponse<EntityProduct>> {
-    console.time('listByData');
     const products = await prisma.product.findMany({
       where: filters && {
         ...filters,
@@ -57,16 +56,16 @@ class ProductRepository implements IProductRepository {
         },
       },
       include: {
+        categories: true,
         cart_items: {
           include: {
             cart: true,
           },
         },
       },
-      skip: (page - 1) * limit,
+      skip: page && limit ? (page - 1) * limit : undefined,
       take: limit,
     });
-    console.timeEnd('listByData');
 
     const productTotal = prisma.product.count({
       where: filters && {
@@ -130,16 +129,28 @@ class ProductRepository implements IProductRepository {
     const product = await prisma.product.create({
       data: {
         ...datas,
+        categories: {
+          connectOrCreate: datas.categories?.map(category => ({
+            where: { name: category },
+            create: { name: category },
+          })),
+        },
       },
     });
     return product;
   }
 
-  async update({ id, ...datas }: Product): Promise<Product> {
+  async update({ id, categories, ...datas }: IProductUpdate): Promise<Product> {
     const updatedProduct = await prisma.product.update({
       where: { id },
       data: {
         ...datas,
+        categories: {
+          connectOrCreate: categories?.map(category => ({
+            where: { name: category },
+            create: { name: category },
+          })),
+        },
       },
     });
 

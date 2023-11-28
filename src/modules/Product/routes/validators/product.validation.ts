@@ -7,6 +7,7 @@ export const createProductMiddleware = celebrate({
     name: Joi.string().required(),
     description: Joi.string(),
     image: Joi.any(),
+    categories: Joi.array().items(Joi.string()),
   },
 });
 
@@ -34,6 +35,7 @@ export const updateProductMiddleware = celebrate({
     name: Joi.string(),
     description: Joi.string(),
     image: Joi.any(),
+    categories: Joi.array().items(Joi.string()),
   },
 });
 

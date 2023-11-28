@@ -19,7 +19,7 @@ class CartRepository implements ICartRepository {
     const cart = await prisma.cart.findFirst({
       where: { ...filter },
       include: {
-        //cart_coupons: true,
+        // cart_coupons: true,
         cart_coupons: {
           include: {
             coupon: true,
@@ -43,8 +43,8 @@ class CartRepository implements ICartRepository {
   }
 
   public async listBy({
-    page = 1,
-    limit = 10,
+    page,
+    limit,
     filters,
   }: // search,
   IPaginatedRequest<Cart>): Promise<IPaginatedResponse<EntityCart>> {
@@ -58,22 +58,26 @@ class CartRepository implements ICartRepository {
       },
       include: {
         // cart_coupons: true,
-        
-      cart_coupons: {
+
+        cart_coupons: {
           include: {
             coupon: true,
           },
         },
-      cart_items: {
+        cart_items: {
           include: {
-            product: true,
+            product: {
+              include: {
+                categories: true,
+              },
+            },
           },
         },
       },
       orderBy: {
         updated_at: 'desc',
       },
-      skip: (page - 1) * limit,
+      skip: page && limit ? (page - 1) * limit : undefined,
       take: limit,
     });
 

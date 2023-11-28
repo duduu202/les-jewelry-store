@@ -17,7 +17,11 @@ const productRouter = Router();
 const productController = new ProductController();
 
 productRouter.use(verifyToken);
-
+productRouter.get(
+  '/categories/',
+  listProductMiddleware,
+  productController.indexCategories,
+);
 productRouter.use(verifyAuthorization([UserRole.Customer, UserRole.Master]));
 productRouter.get('/', listProductMiddleware, productController.index);
 productRouter.get('/:id', showProductMiddleware, productController.show);

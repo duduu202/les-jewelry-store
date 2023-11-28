@@ -1,5 +1,4 @@
-import { Exclude } from 'class-transformer';
-import { Product as IProduct } from '@prisma/client';
+import { Product as IProduct, Category } from '@prisma/client';
 import { Cart_items } from '@modules/Cart/entities/Cart_items';
 
 class Product implements IProduct {
@@ -22,6 +21,8 @@ class Product implements IProduct {
   updated_at: Date;
 
   cart_items: Cart_items;
+
+  categories: Category[] | null;
 }
 
 export { Product };

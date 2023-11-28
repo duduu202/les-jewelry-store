@@ -19,10 +19,10 @@ class UpdateProductService {
     ...productParams
   }: IUpdateProductDTO): Promise<Product> {
     const product = await this.productRepository.findBy({
-      id: id,
+      id,
     });
 
-    if (!product) throw new AppError('Usuário não encontrado', 404);
+    if (!product) throw new AppError('Produto não encontrado', 404);
 
     Object.assign(product, productParams);
 
@@ -35,6 +35,7 @@ class UpdateProductService {
       name: product.name,
       price: product.price,
       stock: product.stock,
+      categories: product.categories,
     });
 
     return plainToInstance(Product, newProduct);

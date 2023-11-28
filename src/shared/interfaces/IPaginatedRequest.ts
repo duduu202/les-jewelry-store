@@ -1,7 +1,8 @@
-interface IPaginatedRequest<T> {
+interface IPaginatedRequest<T, C = any> {
   page?: number;
   limit?: number;
   filters?: Partial<T>; // where
+  customFilters?: C;
   include?: { [key: string]: boolean }; // include
   search?: string;
 }
