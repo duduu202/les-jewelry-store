@@ -1,4 +1,4 @@
-import { Product as IProduct, Category } from '@prisma/client';
+import { Product as IProduct } from '@prisma/client';
 import { Cart_items } from '@modules/Cart/models/Cart_items';
 
 class Product implements IProduct {
@@ -22,7 +22,7 @@ class Product implements IProduct {
 
   cart_items: Cart_items;
 
-  categories: Category[] | null;
+  categories: string[] | null;
 }
 
 export { Product };

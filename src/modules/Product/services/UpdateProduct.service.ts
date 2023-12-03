@@ -45,9 +45,7 @@ class UpdateProductService {
       name: product.name,
       price: product.price,
       stock: product.stock,
-      categories: product.categories
-        ? product.categories.map(category => category.name)
-        : [],
+      categories: product.categories ? product.categories : undefined,
     });
 
     return plainToInstance(Product, newProduct);
