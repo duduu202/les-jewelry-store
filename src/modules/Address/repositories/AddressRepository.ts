@@ -38,7 +38,7 @@ class AddressRepository implements IAddressRepository {
       },
       skip: (page - 1) * limit,
       take: limit,
-      cacheStrategy: { ...prisma_cache_time },
+      // cacheStrategy: { ...prisma_cache_time },
     });
 
     const addressTotal = await prisma.address.count({
@@ -49,7 +49,7 @@ class AddressRepository implements IAddressRepository {
         //  mode: 'insensitive',
         // },
       },
-      cacheStrategy: { ...prisma_cache_time },
+      // cacheStrategy: { ...prisma_cache_time },
     });
 
     return {

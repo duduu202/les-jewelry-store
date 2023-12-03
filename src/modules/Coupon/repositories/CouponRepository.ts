@@ -26,14 +26,14 @@ class CouponRepository implements ICouponRepository {
       },
       skip: (page - 1) * limit,
       take: limit,
-      cacheStrategy: { ...prisma_cache_time },
+      // cacheStrategy: { ...prisma_cache_time },
     });
 
     const couponTotal = await prisma.coupon.count({
       where: filters && {
         ...filters,
       },
-      cacheStrategy: { ...prisma_cache_time },
+      // cacheStrategy: { ...prisma_cache_time },
     });
 
     return {

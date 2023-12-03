@@ -38,7 +38,7 @@ class UserRepository implements IUserRepository {
       },
       skip: limit ? (page - 1) * limit : undefined,
       take: limit,
-      cacheStrategy: { ...prisma_cache_time },
+      // cacheStrategy: { ...prisma_cache_time },
     });
 
     const userTotal = await prisma.user.count({
@@ -49,7 +49,7 @@ class UserRepository implements IUserRepository {
           mode: 'insensitive',
         },
       },
-      cacheStrategy: { ...prisma_cache_time },
+      // cacheStrategy: { ...prisma_cache_time },
     });
 
     return {

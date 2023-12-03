@@ -90,7 +90,7 @@ class CartRepository implements ICartRepository {
       },
       skip: page && limit ? (page - 1) * limit : undefined,
       take: limit,
-      cacheStrategy: { ...prisma_cache_time },
+      // cacheStrategy: { ...prisma_cache_time },
     });
 
     const cartTotal = await prisma.cart.count({

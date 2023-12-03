@@ -26,7 +26,7 @@ class ProductRepository implements IProductRepository {
           },
         },
       },
-      cacheStrategy: { ttl: 60, swr: 30 },
+      // cacheStrategy: { ...prisma_cache_time },
     });
 
     const countNotPaid = productsFil.reduce((acc, prd) => {
@@ -67,9 +67,7 @@ class ProductRepository implements IProductRepository {
       },
       skip: page && limit ? (page - 1) * limit : undefined,
       take: limit,
-      cacheStrategy: {
-        swr: prisma_cache_time.swr,
-      },
+      // cacheStrategy: { ...prisma_cache_time },
     });
 
     const productTotal = prisma.product.count({
@@ -80,9 +78,7 @@ class ProductRepository implements IProductRepository {
           mode: 'insensitive',
         },
       },
-      cacheStrategy: {
-        swr: prisma_cache_time.swr,
-      },
+      // cacheStrategy: { ...prisma_cache_time },
     });
 
     // stock means the total of products in stock
