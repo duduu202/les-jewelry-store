@@ -20,6 +20,7 @@ class UpdateProductService {
   public async execute({
     id,
     request_id,
+    categories,
     ...productParams
   }: IUpdateProductDTO): Promise<Product> {
     const product = await this.productRepository.findBy({
@@ -45,7 +46,7 @@ class UpdateProductService {
       name: product.name,
       price: product.price,
       stock: product.stock,
-      categories: product.categories ? product.categories : undefined,
+      categories,
     });
 
     return plainToInstance(Product, newProduct);

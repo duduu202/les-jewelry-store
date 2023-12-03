@@ -36,20 +36,19 @@ class CartRepository implements ICartRepository {
     if (!cart) return null;
 
     return {
+      ...cart,
       products_price: sumTotalPrice(cart as EntityCart),
       discount: getTotalDiscount(cart as EntityCart),
       total_price: sumTotalPrice(cart as EntityCart, true, true),
-      ...cart,
     } as EntityCart;
   }
 
   public async listBy({
-    page,
+    page = 1,
     limit,
     filters,
     customFilters,
-  }: // search,
-  IPaginatedRequest<Cart, ICustomFilters>): Promise<
+  }: IPaginatedRequest<Cart, ICustomFilters>): Promise<
     IPaginatedResponse<EntityCart>
   > {
     const carts = await prisma.cart.findMany({
@@ -62,14 +61,8 @@ class CartRepository implements ICartRepository {
                 lte: customFilters?.end_date,
               }
             : undefined,
-        // name: {
-        //  contains: search,
-        //  mode: 'insensitive',
-        // },
       },
       include: {
-        // cart_coupons: true,
-
         cart_coupons: {
           include: {
             coupon: true,
@@ -96,10 +89,6 @@ class CartRepository implements ICartRepository {
     const cartTotal = await prisma.cart.count({
       where: filters && {
         ...filters,
-        // name: {
-        //  contains: search,
-        //  mode: 'insensitive',
-        // },
       },
     });
 
@@ -186,7 +175,8 @@ class CartRepository implements ICartRepository {
       data: {
         delivery_fee,
         paid_status: datas.paid_status,
-        address_id: datas.address_id,
+        charge_address_id: datas.charge_address_id,
+        delivery_address_id: datas.delivery_address_id,
         created_at: datas.created_at,
         expires_at: datas.expires_at,
         status: datas.status,
@@ -208,7 +198,6 @@ class CartRepository implements ICartRepository {
           : undefined,
       },
     });
-    console.log('updatedCart', updatedCart);
 
     return updatedCart as EntityCart;
   }

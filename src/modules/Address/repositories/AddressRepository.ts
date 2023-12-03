@@ -61,6 +61,7 @@ class AddressRepository implements IAddressRepository {
   }
 
   async create({
+    name,
     street,
     number,
     district,
@@ -71,6 +72,7 @@ class AddressRepository implements IAddressRepository {
   }: IAddressCreate): Promise<Address> {
     const address = await prisma.address.create({
       data: {
+        name,
         street,
         number,
         district,
@@ -85,6 +87,7 @@ class AddressRepository implements IAddressRepository {
 
   async update({
     id,
+    name,
     street,
     number,
     district,
@@ -95,6 +98,7 @@ class AddressRepository implements IAddressRepository {
     const updatedAddress = await prisma.address.update({
       where: { id },
       data: {
+        name,
         street,
         number,
         district,

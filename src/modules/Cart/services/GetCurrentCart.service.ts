@@ -1,11 +1,15 @@
 import { AppError } from '@shared/error/AppError';
 import { plainToInstance } from 'class-transformer';
 import { inject, injectable } from 'tsyringe';
-import { Paid_status } from '@prisma/client';
 import { IUserRepository } from '@modules/User/repositories/UserRepository.interface';
-import { Cart } from '../models/Cart';
+import { Cart, Cart as EntityCart } from '../models/Cart';
 import { ICartRepository } from '../repositories/CartRepository.interface';
 import { IGetCurrentCartDTO } from './dto/GetCurrentCartDTO';
+import {
+  formatCart,
+  getTotalDiscount,
+  sumTotalPrice,
+} from '../util/CartValues';
 
 @injectable()
 class GetCurrentCartService {
@@ -25,6 +29,11 @@ class GetCurrentCartService {
       {
         current_cart: {
           include: {
+            cart_coupons: {
+              include: {
+                coupon: true,
+              },
+            },
             cart_items: {
               include: {
                 product: true,
@@ -38,7 +47,7 @@ class GetCurrentCartService {
 
     if (user.current_cart) {
       this.checkIfCartIsExpired(user.current_cart);
-      return plainToInstance(Cart, user.current_cart);
+      return plainToInstance(Cart, formatCart(user.current_cart));
     }
 
     const newCart = await this.cartRepository.create({
@@ -50,7 +59,7 @@ class GetCurrentCartService {
 
     await this.userRepository.update(user);
 
-    return plainToInstance(Cart, newCart);
+    return plainToInstance(Cart, formatCart(newCart));
   }
 
   checkIfCartIsExpired(cart: Cart) {

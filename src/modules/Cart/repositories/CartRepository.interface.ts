@@ -1,4 +1,4 @@
-import { Cart } from '@prisma/client';
+import { Cart, Prisma } from '@prisma/client';
 import { IPaginatedRequest } from 'src/shared/interfaces/IPaginatedRequest';
 import { IPaginatedResponse } from 'src/shared/interfaces/IPaginatedResponse';
 import { Cart as EntityCart } from '../models/Cart';
@@ -16,6 +16,7 @@ interface ICartRepository {
   ): Promise<EntityCart | null>;
   listBy(
     filter: IPaginatedRequest<Cart, ICustomFilters>,
+    include?: Prisma.CartInclude,
   ): Promise<IPaginatedResponse<EntityCart>>;
   create(cart: ICartCreate): Promise<Cart>;
   update(cart: ICartUpdate): Promise<EntityCart>;

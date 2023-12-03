@@ -1,4 +1,5 @@
 interface ICreateAddressDTO {
+  name: string;
   street: string;
   number: string;
   district: string;

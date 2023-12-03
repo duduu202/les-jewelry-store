@@ -3,6 +3,7 @@ import { celebrate, Joi, Segments } from 'celebrate';
 export const createAddressMiddleware = celebrate({
   [Segments.BODY]: {
     user_id: Joi.string().uuid(),
+    name: Joi.string().required(),
     street: Joi.string().required(),
     number: Joi.string().required(),
     district: Joi.string().required(),
@@ -32,6 +33,7 @@ export const updateAddressMiddleware = celebrate({
   },
   [Segments.BODY]: {
     user_id: Joi.string().uuid(),
+    name: Joi.string().required(),
     street: Joi.string(),
     number: Joi.string(),
     district: Joi.string(),

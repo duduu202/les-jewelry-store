@@ -21,19 +21,21 @@ export const payCartMiddleware = celebrate({
     id: Joi.string().uuid().required(),
   },
   [Segments.BODY]: {
-    payment_cards: Joi.array().optional()
+    payment_cards: Joi.array()
+      .optional()
       .items(
         Joi.object({
           payment_card_id: Joi.string().uuid().required(),
           percentage: Joi.number().min(1).max(100).required(),
         }),
       ),
-      //.min(1),
-      //.default([]),
-      //.empty([]),
-      //.required(),
+    // .min(1),
+    // .default([]),
+    // .empty([]),
+    // .required(),
     coupon_codes: Joi.array().items(Joi.string()),
-    address_id: Joi.string().uuid().required(),
+    charge_address_id: Joi.string().uuid().required(),
+    delivery_address_id: Joi.string().uuid().required(),
   },
 });
 

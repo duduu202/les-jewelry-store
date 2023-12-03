@@ -5,6 +5,8 @@ type IAddress = Prisma.AddressGetPayload<{
   include: { user: true };
 }>;
 class Address implements IAddress {
+  name: string;
+
   user: User;
 
   id: string;

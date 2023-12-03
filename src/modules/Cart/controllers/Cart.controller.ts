@@ -29,7 +29,12 @@ class CartController {
   async pay(req: Request, res: Response): Promise<Response> {
     const { id } = req.params;
     const { user } = req;
-    const { payment_cards, coupon_codes, address_id } = req.body;
+    const {
+      payment_cards,
+      coupon_codes,
+      charge_address_id,
+      delivery_address_id,
+    } = req.body;
 
     const payCartService = container.resolve(PayCartService);
 
@@ -38,7 +43,8 @@ class CartController {
       payment_cards: payment_cards || [],
       request_id: user.id,
       coupon_codes,
-      address_id,
+      charge_address_id,
+      delivery_address_id,
     });
 
     return res.json(Cart);

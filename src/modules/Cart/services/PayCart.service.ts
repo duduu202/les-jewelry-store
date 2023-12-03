@@ -17,6 +17,8 @@ import { Product } from '@modules/Product/models/Product';
 import { PaymentCard } from '@modules/PaymentCard/models/PaymentCard';
 import { IAddressRepository } from '@modules/Address/repositories/AddressRepository.interface';
 import { v4 } from 'uuid';
+import { User } from '@modules/User/models/User';
+import { IUserRepository } from '@modules/User/repositories/UserRepository.interface';
 import { IPayCartDTO } from './dto/PayCartDTO copy';
 import { Cart } from '../models/Cart';
 import { ICartRepository } from '../repositories/CartRepository.interface';
@@ -29,7 +31,9 @@ interface IConfirmPayment {
   cupom_id?: string;
   discount: number;
   coupons?: Coupon[];
-  address: Address;
+  charge_address: Address;
+  delivery_address: Address;
+  user: User;
 }
 @injectable()
 class PayCartService {
@@ -52,28 +56,42 @@ class PayCartService {
 
     @inject('AddressRepository')
     private addressRepository: IAddressRepository,
+
+    @inject('UserRepository')
+    private userRepository: IUserRepository,
   ) {
     // this.time_available_in_minutes = time_available_in_minutes;
   }
 
   public async execute({ ...cartParams }: IPayCartDTO): Promise<Cart> {
-    console.log(cartParams.request_id);
     const { payment_cards, coupon_codes, request_id, cart_id } = cartParams;
 
-    const cart = await this.cartRepository.findBy({
-      id: cart_id,
-      user_id: request_id,
-    });
+    const [charge_address, delivery_address, cart, user] = await Promise.all([
+      this.addressRepository.findBy({
+        id: cartParams.charge_address_id,
+        user_id: request_id,
+      }),
+      this.addressRepository.findBy({
+        id: cartParams.delivery_address_id,
+        user_id: request_id,
+      }),
+      await this.cartRepository.findBy({
+        id: cart_id,
+        user_id: request_id,
+      }),
+      this.userRepository.findBy({
+        id: request_id,
+      }),
+    ]);
+
+    if (!user) throw new AppError('Usuário não encontrado', 404);
+
     if (!cart) throw new AppError('Carrinho não encontrado', 404);
-    console.log('cart');
-    console.dir(cart, { depth: 10 });
+
     await this.checkCart(cart);
 
-    const address = await this.addressRepository.findBy({
-      id: cartParams.address_id,
-      user_id: request_id,
-    });
-    if (!address) throw new AppError('Endereço não encontrado', 404);
+    if (!charge_address || !delivery_address)
+      throw new AppError('Endereço não encontrado', 404);
 
     const products = await this.checkProducts(cart);
     let discount = 0;
@@ -116,7 +134,9 @@ class PayCartService {
       total_value,
       discount,
       coupons,
-      address,
+      charge_address,
+      delivery_address,
+      user,
     });
 
     const updated_cart = await this.confirmPayment({
@@ -126,7 +146,9 @@ class PayCartService {
       total_value,
       discount,
       coupons,
-      address,
+      charge_address,
+      delivery_address,
+      user,
     });
 
     return plainToInstance(Cart, updated_cart);
@@ -321,7 +343,8 @@ class PayCartService {
       created_at: datas.cart.created_at,
       id: datas.cart.id,
       user_id: datas.cart.user_id,
-      address_id: datas.address.id,
+      delivery_address_id: datas.delivery_address.id,
+      charge_address_id: datas.charge_address.id,
       cart_coupons:
         datas.coupons?.map(coup => {
           return {
@@ -338,6 +361,10 @@ class PayCartService {
       cart_items: datas.cart.cart_items,
       cart_payment_cards: datas.cart.cart_payment_cards,
     });
+
+    datas.user.current_cart_id = null;
+
+    await this.userRepository.update(datas.user);
 
     await this.generateCouponWhenNegative(datas);
 

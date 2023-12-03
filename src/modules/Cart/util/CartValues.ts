@@ -70,3 +70,12 @@ export function getDeliveryFee(
 
   return delivery_fee;
 }
+
+export function formatCart(cart: Partial<Cart>) {
+  return {
+    ...cart,
+    products_price: sumTotalPrice(cart as Cart),
+    discount: getTotalDiscount(cart as Cart),
+    total_price: sumTotalPrice(cart as Cart, true, true),
+  };
+}

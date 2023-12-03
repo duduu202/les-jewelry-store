@@ -56,9 +56,10 @@ model Address {
   user_charge_address User[] @relation("UserChargeAddress")
   user_delivery_address User[] @relation("UserDeliveryAddress")
 
+  cartCharge    Cart[] @relation("CartChargeAddress")
+  cartDelivery  Cart[] @relation("CartDeliveryAddress")
 
-  cart    Cart[]
-
+  name String @default("")
   street   String
   number   String
   district String
@@ -159,8 +160,10 @@ model Cart {
   cart_coupons CartCoupon[]
   status       Cart_status @default(EM_PROCESSAMENTO)
   paid_status  Paid_status @default(NOT_PAID)
-  address_id   String?
-  address      Address?    @relation(fields: [address_id], references: [id])
+  charge_address_id   String?
+  charge_address      Address?    @relation("CartChargeAddress", fields: [charge_address_id], references: [id])
+  delivery_address_id String?
+  delivery_address    Address?    @relation("CartDeliveryAddress", fields: [delivery_address_id], references: [id])
   delivery_fee Float       @default(0)
 
   expires_at DateTime?

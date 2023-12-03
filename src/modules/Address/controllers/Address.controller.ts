@@ -9,11 +9,12 @@ import { UpdateAddressService } from '../services/UpdateAddress.service';
 
 class AddressController {
   async create(req: Request, res: Response): Promise<Response> {
-    const { street, number, district, city, state, zip_code, user_id } =
+    const { name, street, number, district, city, state, zip_code, user_id } =
       req.body;
     const createAddressService = container.resolve(CreateAddressService);
 
     const Address = await createAddressService.execute({
+      name,
       city,
       district,
       number,

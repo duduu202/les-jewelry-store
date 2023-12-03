@@ -4,11 +4,18 @@ import { Product } from '@modules/Product/models/Product';
 import { IProductRepository } from '@modules/Product/repositories/ProductRepository.interface';
 import { Paid_status } from '@prisma/client';
 import { inject, injectable } from 'tsyringe';
-import { IDashboard, IData, IGroupData } from '../models/Dashboard';
 import { IGroupDTO, IShowDashboardDTO } from './dto/ShowDashboardDTO';
 
 interface IProductOrder extends Product {
   order_date: Date;
+}
+
+interface IDashboardGroup {
+  categories: string[];
+  datas: {
+    date: Date;
+    quantity: number;
+  }[];
 }
 
 @injectable()
@@ -26,33 +33,40 @@ class ShowDashboardService {
     end_date,
     compareGroups,
     division_split = 12,
-  }: IShowDashboardDTO): Promise<IDashboard> {
-    const orders = await this.cartRepository.listBy({
-      filters: {
-        // paid or refunded
-        paid_status: {
-          in: [Paid_status.PAID, Paid_status.REFUNDED],
+  }: IShowDashboardDTO): Promise<IDashboardGroup[]> {
+    const orders = await this.cartRepository.listBy(
+      {
+        filters: {
+          // paid or refunded
+          paid_status: {
+            in: [Paid_status.PAID, Paid_status.REFUNDED],
+          },
+        },
+        customFilters: {
+          start_date,
+          end_date,
+        },
+        page: undefined,
+        limit: undefined,
+      },
+      {
+        include: {
+          categories: true,
+          cart_items: {
+            include: {
+              cart: true,
+            },
+          },
         },
       },
-      customFilters: {
-        start_date,
-        end_date,
-      },
-      include: {
-        user: true,
-        products: true,
-      },
-      page: undefined,
-      limit: undefined,
-    });
+    );
 
     const products = this.getProducts(orders.results);
 
-    const groups = this.manyGroupBy(products, compareGroups);
+    const groups = this.getAndGroups(products, compareGroups);
 
-    const totalDiffInterval = end_date.getTime() - start_date.getTime();
-
-    const interval = totalDiffInterval / division_split;
+    const interval =
+      (end_date.getTime() - start_date.getTime()) / division_split;
 
     const intervalDates: Date[] = [];
 
@@ -66,7 +80,7 @@ class ShowDashboardService {
 
     const result = groups.map(group => {
       return {
-        name: group.category,
+        categories: group.categories,
         datas: intervalDates.map(date => {
           const filteredProducts = group.products.filter(product => {
             const isBetween =
@@ -102,7 +116,10 @@ class ShowDashboardService {
     return allProducts;
   }
 
-  manyGroupBy(
+  /**
+   * this will return the products grouped by categories, the product needs to have at least one category in categories
+   */
+  getOrGroups(
     products: IProductOrder[],
     compareGroups: IGroupDTO[],
   ): {
@@ -111,15 +128,38 @@ class ShowDashboardService {
   }[] {
     const groups = compareGroups.map(grp => {
       const group = products.filter(product => {
-        const hasCategory = grp.categories.map(cat => {
+        const hasCategory = grp.categories.find(cat => {
           const has = product.categories?.find(c => c.name === cat);
           return !!has;
         });
+        return !!hasCategory;
+      });
+      return {
+        categories: grp.categories,
+        products: group,
+      };
+    });
 
-        // const hasCategory = product.categories?.find(
-        //   cat => cat.name === grp.categories
-        // );
-        return hasCategory;
+    return groups;
+  }
+
+  /**
+   * this will return the products grouped by categories, the product needs to have all categories in categories
+   */
+  getAndGroups(
+    products: IProductOrder[],
+    compareGroups: IGroupDTO[],
+  ): {
+    categories: string[];
+    products: IProductOrder[];
+  }[] {
+    const groups = compareGroups.map(grp => {
+      const group = products.filter(product => {
+        const hasAllCategories = grp.categories.every(cat => {
+          const has = product.categories?.find(c => c.name === cat);
+          return !!has;
+        });
+        return !!hasAllCategories;
       });
       return {
         categories: grp.categories,

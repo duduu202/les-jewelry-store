@@ -17,7 +17,8 @@ export interface ICartCreate {
 
 export interface ICartUpdate {
   delivery_fee?: number;
-  address_id: string | null;
+  charge_address_id: string | null;
+  delivery_address_id: string | null;
   expires_at: Date | null;
   paid_status: Paid_status;
   id: string;

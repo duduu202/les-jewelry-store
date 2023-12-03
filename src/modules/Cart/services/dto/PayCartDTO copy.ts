@@ -4,7 +4,8 @@ interface IPayCartDTO {
   cart_id: string;
   request_id: string;
   coupon_codes?: string[];
-  address_id: string;
+  charge_address_id: string;
+  delivery_address_id: string;
   payment_cards: { card_id: string; percentage: number }[];
 }
 

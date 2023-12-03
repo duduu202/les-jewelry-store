@@ -6,7 +6,8 @@ import { CartCoupon } from './CartCoupon';
 
 type ICart = Prisma.CartGetPayload<{
   include: {
-    address: true;
+    charge_address: true;
+    delivery_address: true;
     cart_items: {
       include: {
         product: true;
@@ -26,7 +27,13 @@ type ICart = Prisma.CartGetPayload<{
 }>;
 
 class Cart implements ICart {
-  address: Address | null;
+  charge_address: Address | null;
+
+  delivery_address: Address | null;
+
+  charge_address_id: string | null;
+
+  delivery_address_id: string | null;
 
   is_default: boolean;
 

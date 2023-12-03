@@ -1,4 +1,4 @@
-import { Product } from '@prisma/client';
+import { Product, Prisma } from '@prisma/client';
 import { IPaginatedRequest } from 'src/shared/interfaces/IPaginatedRequest';
 import { IPaginatedResponse } from 'src/shared/interfaces/IPaginatedResponse';
 import { Product as EntityProduct } from '../models/Product';
@@ -11,6 +11,7 @@ interface IProductRepository {
   ): Promise<EntityProduct | null>;
   listBy(
     filter: IPaginatedRequest<Product>,
+    include?: Prisma.ProductInclude,
   ): Promise<IPaginatedResponse<EntityProduct>>;
   create(product: IProductCreate): Promise<Product>;
   update(product: IProductUpdate): Promise<Product>;

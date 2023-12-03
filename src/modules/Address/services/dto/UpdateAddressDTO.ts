@@ -1,4 +1,5 @@
 interface IUpdateAddressDTO {
+  name?: string;
   street?: string;
   number?: string;
   district?: string;

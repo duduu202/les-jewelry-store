@@ -3,6 +3,7 @@ import { inject, injectable } from 'tsyringe';
 
 import { plainToInstance } from 'class-transformer';
 import { IPaginatedRequest } from '@shared/interfaces/IPaginatedRequest';
+import { IPaginatedResponse } from '@shared/interfaces/IPaginatedResponse';
 import { IProductRepository } from '../repositories/ProductRepository.interface';
 import { Product } from '../models/Product';
 
@@ -19,7 +20,7 @@ class ListProductService {
     page,
     include,
     search,
-  }: IPaginatedRequest<Product>): Promise<Product> {
+  }: IPaginatedRequest<Product>): Promise<IPaginatedResponse<Product>> {
     const product = await this.productRepository.listBy({
       filters,
       limit,
@@ -30,7 +31,12 @@ class ListProductService {
 
     if (!product) throw new AppError('Endereço não encontrado', 404);
 
-    return plainToInstance(Product, product);
+    return {
+      page: product.page,
+      limit: product.limit,
+      results: plainToInstance(Product, product.results),
+      total: product.total,
+    };
   }
 }
 
