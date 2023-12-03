@@ -7,7 +7,6 @@ import {
   createProductMiddleware,
   deleteProductMiddleware,
   listProductMiddleware,
-  refundProductMiddleware,
   showProductMiddleware,
   updateProductMiddleware,
 } from './validators/product.validation';
@@ -36,6 +35,11 @@ productRouter.post(
   productController.create,
 );
 productRouter.delete('/:id', deleteProductMiddleware, productController.delete);
-productRouter.put('/:id', updateProductMiddleware, productController.update);
+productRouter.put(
+  '/:id',
+  uploadMulter.single('image'),
+  updateProductMiddleware,
+  productController.update,
+);
 
 export { productRouter };

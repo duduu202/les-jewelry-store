@@ -76,6 +76,7 @@ class ProductController {
 
     const Product = await updateProductService.execute({
       id,
+      image: req.file?.filename,
       request_id: req.user.id,
       ...data,
     });
