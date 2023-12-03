@@ -1,8 +1,10 @@
 import { instanceToInstance } from 'class-transformer';
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
+import { CreateCouponService } from '../services/CreateCoupon.service';
 import { ListCouponService } from '../services/ListCoupon.service';
 import { ShowCouponService } from '../services/ShowCoupon.service';
+import { UpdateCouponService } from '../services/UpdateCoupon.service';
 
 class CouponController {
   async show(req: Request, res: Response): Promise<Response> {
@@ -35,6 +37,33 @@ class CouponController {
     });
 
     return res.json(instanceToInstance(coupons));
+  }
+
+  async create(req: Request, res: Response): Promise<Response> {
+    const { code, discount } = req.body;
+
+    const createCouponService = container.resolve(CreateCouponService);
+
+    const coupon = await createCouponService.execute({
+      code,
+      discount,
+    });
+
+    return res.status(201).json(instanceToInstance(coupon));
+  }
+
+  async update(req: Request, res: Response): Promise<Response> {
+    const { code, discount } = req.body;
+
+    const updateCouponService = container.resolve(UpdateCouponService);
+
+    const coupon = await updateCouponService.execute({
+      id: req.params.id,
+      code,
+      discount,
+    });
+
+    return res.status(201).json(instanceToInstance(coupon));
   }
 }
 

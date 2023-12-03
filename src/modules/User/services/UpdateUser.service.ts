@@ -5,7 +5,7 @@ import { plainToInstance } from 'class-transformer';
 import { IHashProvider } from '@shared/container/providers/HashProvider/model/IHashProvider';
 import { IUserRepository } from '../repositories/UserRepository.interface';
 import { IUpdateUserDTO } from './dto/UpdateUserDTO';
-import { User } from '../entities/User';
+import { User } from '../models/User';
 
 @injectable()
 class UpdateUserService {

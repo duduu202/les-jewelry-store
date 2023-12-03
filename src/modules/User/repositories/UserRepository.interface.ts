@@ -1,13 +1,13 @@
-import { User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import { IPaginatedRequest } from 'src/shared/interfaces/IPaginatedRequest';
 import { IPaginatedResponse } from 'src/shared/interfaces/IPaginatedResponse';
-import { User as EntityUser } from '../entities/User';
+import { User as EntityUser } from '../models/User';
 import { IUserCreate } from './dto/UserRepositoryDTO';
 
 interface IUserRepository {
   findBy(
     filter: Partial<User>,
-    include?: { [key: string]: boolean },
+    include?: Prisma.UserInclude,
   ): Promise<EntityUser | null>;
   listBy(
     filter: IPaginatedRequest<User>,

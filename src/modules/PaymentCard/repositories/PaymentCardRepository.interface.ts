@@ -1,13 +1,13 @@
 import { PaymentCard } from '@prisma/client';
 import { IPaginatedRequest } from 'src/shared/interfaces/IPaginatedRequest';
 import { IPaginatedResponse } from 'src/shared/interfaces/IPaginatedResponse';
-import { PaymentCard as EntityPaymentCard } from '../entities/PaymentCard';
+import { PaymentCard as EntityPaymentCard } from '../models/PaymentCard';
 import { IPaymentCardCreate } from './dto/PaymentCardRepositoryDTO';
 
 interface IPaymentCardRepository {
   findBy(
     filter: Partial<PaymentCard>,
-    //include?: { [key: string]: boolean },
+    // include?: { [key: string]: boolean },
   ): Promise<EntityPaymentCard | null>;
   listBy(
     filter: IPaginatedRequest<PaymentCard>,

@@ -4,7 +4,7 @@ import { inject, injectable } from 'tsyringe';
 import { plainToInstance } from 'class-transformer';
 import { IUserRepository } from '../repositories/UserRepository.interface';
 import { IShowUserDTO } from './dto/ShowUserDTO';
-import { User } from '../entities/User';
+import { User } from '../models/User';
 
 @injectable()
 class ShowUserService {

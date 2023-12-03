@@ -4,7 +4,7 @@ import { inject, injectable } from 'tsyringe';
 import { plainToInstance } from 'class-transformer';
 import { IPaginatedRequest } from '@shared/interfaces/IPaginatedRequest';
 import { IUserRepository } from '../repositories/UserRepository.interface';
-import { User } from '../entities/User';
+import { User } from '../models/User';
 
 @injectable()
 class ListUserService {

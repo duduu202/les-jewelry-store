@@ -4,12 +4,12 @@ import { IPaginatedRequest } from '@shared/interfaces/IPaginatedRequest';
 import { IPaginatedResponse } from '@shared/interfaces/IPaginatedResponse';
 import { IPaymentCardCreate } from './dto/PaymentCardRepositoryDTO';
 import { IPaymentCardRepository } from './PaymentCardRepository.interface';
-import { PaymentCard as EntityPaymentCard } from '../entities/PaymentCard';
+import { PaymentCard as EntityPaymentCard } from '../models/PaymentCard';
 
 class PaymentCardRepository implements IPaymentCardRepository {
   async findBy(
     filter: Partial<PaymentCard>,
-    //include?: { [key: string]: boolean },
+    // include?: { [key: string]: boolean },
   ): Promise<EntityPaymentCard | null> {
     const paymentCard = await prisma.paymentCard.findFirst({
       where: { ...filter },
@@ -22,15 +22,17 @@ class PaymentCardRepository implements IPaymentCardRepository {
     page = 1,
     limit = 10,
     filters,
-    //search,
-  }: IPaginatedRequest<PaymentCard>): Promise<IPaginatedResponse<EntityPaymentCard>> {
+  }: // search,
+  IPaginatedRequest<PaymentCard>): Promise<
+    IPaginatedResponse<EntityPaymentCard>
+  > {
     const paymentCard = await prisma.paymentCard.findMany({
       where: filters && {
         ...filters,
-        //name: {
+        // name: {
         //  contains: search,
         //  mode: 'insensitive',
-        //},
+        // },
       },
       skip: (page - 1) * limit,
       take: limit,
@@ -39,10 +41,10 @@ class PaymentCardRepository implements IPaymentCardRepository {
     const paymentCardTotal = await prisma.paymentCard.count({
       where: filters && {
         ...filters,
-        //name: {
+        // name: {
         //  contains: search,
         //  mode: 'insensitive',
-        //},
+        // },
       },
     });
 
@@ -57,7 +59,7 @@ class PaymentCardRepository implements IPaymentCardRepository {
   async create({ ...datas }: IPaymentCardCreate): Promise<PaymentCard> {
     const paymentCard = await prisma.paymentCard.create({
       data: {
-        ...datas
+        ...datas,
       },
     });
     return paymentCard;
@@ -67,7 +69,7 @@ class PaymentCardRepository implements IPaymentCardRepository {
     const updatedPaymentCard = await prisma.paymentCard.update({
       where: { id },
       data: {
-        ...datas
+        ...datas,
       },
     });
 

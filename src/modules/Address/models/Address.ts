@@ -1,16 +1,30 @@
-import { Exclude } from 'class-transformer';
-import { Address as IAddress } from '@prisma/client';
+import { Prisma } from '@prisma/client';
+import { User } from '@modules/User/models/User';
 
+type IAddress = Prisma.AddressGetPayload<{
+  include: { user: true };
+}>;
 class Address implements IAddress {
+  user: User;
+
   id: string;
+
   user_id: string;
+
   street: string;
+
   number: string;
+
   district: string;
+
   city: string;
+
   state: string;
+
   zip_code: string;
+
   created_at: Date;
+
   updated_at: Date;
 }
 

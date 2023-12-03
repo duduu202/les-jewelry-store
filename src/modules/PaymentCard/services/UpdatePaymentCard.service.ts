@@ -4,7 +4,7 @@ import { inject, injectable } from 'tsyringe';
 import { plainToInstance } from 'class-transformer';
 import { IPaymentCardRepository } from '../repositories/PaymentCardRepository.interface';
 import { IUpdatePaymentCardDTO } from './dto/UpdatePaymentCardDTO';
-import { PaymentCard } from '../entities/PaymentCard';
+import { PaymentCard } from '../models/PaymentCard';
 
 @injectable()
 class UpdatePaymentCardService {
@@ -19,7 +19,7 @@ class UpdatePaymentCardService {
     ...paymentCardParams
   }: IUpdatePaymentCardDTO): Promise<PaymentCard> {
     const paymentCard = await this.paymentCardRepository.findBy({
-      id: id,
+      id,
       user_id: request_id,
     });
 

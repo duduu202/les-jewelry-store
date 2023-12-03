@@ -1,15 +1,13 @@
+import { prisma_cache_time } from '@config/prismaCacheTime';
 import { Coupon, Coupon_type } from '@prisma/client';
 import { prisma } from '@shared/database';
 import { IPaginatedRequest } from '@shared/interfaces/IPaginatedRequest';
 import { IPaginatedResponse } from '@shared/interfaces/IPaginatedResponse';
 import { ICouponRepository } from './CartRepository.interface';
 import { ICouponCreate } from './dto/CuponRepositoryDTO';
-;
 
 class CouponRepository implements ICouponRepository {
-  async findBy(
-    filter: Partial<Coupon>,
-  ): Promise<Coupon | null> {
+  async findBy(filter: Partial<Coupon>): Promise<Coupon | null> {
     const coupon = await prisma.coupon.findFirst({
       where: { ...filter },
     });
@@ -28,12 +26,14 @@ class CouponRepository implements ICouponRepository {
       },
       skip: (page - 1) * limit,
       take: limit,
+      cacheStrategy: { ...prisma_cache_time },
     });
 
     const couponTotal = await prisma.coupon.count({
       where: filters && {
         ...filters,
       },
+      cacheStrategy: { ...prisma_cache_time },
     });
 
     return {
@@ -44,13 +44,16 @@ class CouponRepository implements ICouponRepository {
     };
   }
 
-  async create({ type = Coupon_type.exchange, ...datas }: ICouponCreate): Promise<Coupon> {
+  async create({
+    type = Coupon_type.exchange,
+    ...datas
+  }: ICouponCreate): Promise<Coupon> {
     const coupon = await prisma.coupon.create({
       data: {
         code: datas.code,
         discount: datas.discount,
         expires_at: datas.expires_at,
-        type: type,
+        type,
         user_id: datas.user_id,
       },
     });

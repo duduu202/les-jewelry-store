@@ -5,8 +5,11 @@ import { plainToInstance } from 'class-transformer';
 import { IPaginatedRequest } from '@shared/interfaces/IPaginatedRequest';
 import { IPaginatedResponse } from '@shared/interfaces/IPaginatedResponse';
 import { Paid_status } from '@prisma/client';
-import { ICartRepository } from '../repositories/CartRepository.interface';
-import { Cart } from '../entities/Cart';
+import {
+  ICartRepository,
+  ICustomFilters,
+} from '../repositories/CartRepository.interface';
+import { Cart } from '../models/Cart';
 
 @injectable()
 class ListCartService {
@@ -21,7 +24,9 @@ class ListCartService {
     page,
     include,
     search,
-  }: IPaginatedRequest<Cart>): Promise<IPaginatedResponse<Cart>> {
+  }: IPaginatedRequest<Cart, ICustomFilters>): Promise<
+    IPaginatedResponse<Cart>
+  > {
     const cart = await this.cartRepository.listBy({
       filters,
       limit,
@@ -41,15 +46,15 @@ class ListCartService {
   }
 
   fixCurrentCart(carts: Cart[]): Cart[] {
-    const currentCarts = carts.filter(cart => cart.is_current);
+    // const currentCarts = carts.filter(cart => cart.is_current);
 
-    // all current carts paid are not current anymore
-    currentCarts.forEach(cart => {
-      if (cart.paid_status === Paid_status.PAID) {
-        cart.is_current = false;
-        this.cartRepository.update(cart);
-      }
-    });
+    // // all current carts paid are not current anymore
+    // currentCarts.forEach(cart => {
+    //   if (cart.paid_status === Paid_status.PAID) {
+    //     cart.is_current = false;
+    //     this.cartRepository.update(cart);
+    //   }
+    // });
 
     return carts;
   }

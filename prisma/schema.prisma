@@ -3,25 +3,33 @@
 
 generator client {
   provider = "prisma-client-js"
+  // --no-engine
+  
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_ACCELERATE_URL")
+  directUrl = env("DATABASE_URL")
+  
   //shadowDatabaseUrl = env("DATABASE_URL")
 }
 
+
 model User {
+  
   id String @id @default(uuid())
 
   payment_card PaymentCard[]
   address      Address[] @relation("UserAddress")
 
-  charge_address_id String?
+  charge_address_id String? @unique
   charge_address Address? @relation("UserChargeAddress", fields: [charge_address_id], references: [id], onDelete: Cascade)
-  delivery_address_id String?
+  delivery_address_id String? @unique
   delivery_address Address? @relation("UserDeliveryAddress", fields: [delivery_address_id], references: [id], onDelete: Cascade)
   
+  current_cart_id String? @unique
+  current_cart Cart? @relation("UserCurrentCart", fields: [current_cart_id], references: [id], onDelete: SetNull)
 
   //coupon     Coupon?
   //order     Order?
@@ -142,7 +150,7 @@ model Cart {
   id      String @id @default(uuid())
   user_id String
 
-  is_current Boolean @default(false)
+  current_user User? @relation("UserCurrentCart")
 
   // many to many
   cart_items         CartItems[]
@@ -154,7 +162,6 @@ model Cart {
   address_id   String?
   address      Address?    @relation(fields: [address_id], references: [id])
   delivery_fee Float       @default(0)
-    is_default Boolean @default(false)
 
   expires_at DateTime?
   created_at DateTime    @default(now())

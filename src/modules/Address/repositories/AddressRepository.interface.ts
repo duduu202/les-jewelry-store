@@ -1,13 +1,13 @@
 import { Address } from '@prisma/client';
 import { IPaginatedRequest } from 'src/shared/interfaces/IPaginatedRequest';
 import { IPaginatedResponse } from 'src/shared/interfaces/IPaginatedResponse';
-import { Address as EntityAddress } from '../entities/Address';
+import { Address as EntityAddress } from '../models/Address';
 import { IAddressCreate } from './dto/AddressRepositoryDTO';
 
 interface IAddressRepository {
   findBy(
     filter: Partial<Address>,
-    //include?: { [key: string]: boolean },
+    // include?: { [key: string]: boolean },
   ): Promise<EntityAddress | null>;
   listBy(
     filter: IPaginatedRequest<Address>,

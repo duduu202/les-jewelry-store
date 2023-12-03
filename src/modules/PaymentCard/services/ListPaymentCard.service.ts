@@ -4,7 +4,7 @@ import { inject, injectable } from 'tsyringe';
 import { plainToInstance } from 'class-transformer';
 import { IPaginatedRequest } from '@shared/interfaces/IPaginatedRequest';
 import { IPaymentCardRepository } from '../repositories/PaymentCardRepository.interface';
-import { PaymentCard } from '../entities/PaymentCard';
+import { PaymentCard } from '../models/PaymentCard';
 
 @injectable()
 class ListPaymentCardService {

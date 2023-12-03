@@ -45,18 +45,16 @@ class ProductController {
   }
 
   async index(req: Request, res: Response): Promise<Response> {
-    const { page, limit, name } = req.query;
+    const { page, limit, search } = req.query;
 
     const listProductService = container.resolve(ListProductService);
 
     const Products = await listProductService.execute({
-      filters: {
-        name: name ? String(name) : undefined,
-      },
+      filters: {},
       limit: limit ? Number(limit) : undefined,
       page: page ? Number(page) : undefined,
       // include: include ? { [String(include)]: true } : undefined,
-      search: name ? String(name) : undefined,
+      search: search ? String(search) : undefined,
     });
 
     return res.json(instanceToInstance(Products));

@@ -13,7 +13,7 @@ import {
   ICreateSessionDTO,
   ICreateSessionResponseDTO,
 } from './dto/CreateSessionDTO';
-import { User } from '../entities/User';
+import { User } from '../models/User';
 
 @injectable()
 class CreateSessionService {
@@ -35,14 +35,17 @@ class CreateSessionService {
     console.log('user');
     console.log(user);
 
-    if (!user)
-      throw new AppError('Email ou senha inválidos', 404);
+    if (!user) throw new AppError('Email ou senha inválidos', 404);
 
     const passwordMatched = await compare(password, user.password);
 
     if (!passwordMatched) throw new AppError('Email ou senha inválidos', 401);
 
-    const jwToken = jwtGenerate(user.id, user.role === UserRole.Master, user.role);
+    const jwToken = jwtGenerate(
+      user.id,
+      user.role === UserRole.Master,
+      user.role,
+    );
 
     const refreshToken = remember_me ? uuidV4() : undefined;
 

@@ -1,3 +1,4 @@
+import { prisma_cache_time } from '@config/prismaCacheTime';
 import { Category } from '@prisma/client';
 import { prisma } from '@shared/database';
 import { IPaginatedRequest } from '@shared/interfaces/IPaginatedRequest';
@@ -31,6 +32,7 @@ class CategoryRepository implements ICategoryRepository {
           mode: 'insensitive',
         },
       },
+      cacheStrategy: { ...prisma_cache_time },
     });
 
     const categories = prisma.category.findMany({
@@ -43,6 +45,7 @@ class CategoryRepository implements ICategoryRepository {
       },
       skip: (page - 1) * limit,
       take: limit,
+      cacheStrategy: { ...prisma_cache_time },
     });
 
     return {

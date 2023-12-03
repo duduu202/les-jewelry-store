@@ -1,11 +1,9 @@
-
 import { AppError } from '@shared/error/AppError';
 import { plainToInstance } from 'class-transformer';
 import { inject, injectable } from 'tsyringe';
-import { Cart } from '../entities/Cart';
+import { Cart } from '../models/Cart';
 import { ICartRepository } from '../repositories/CartRepository.interface';
 import { IShowCartDTO } from './dto/ShowCartDTO';
-
 
 @injectable()
 class ShowCartService {
@@ -16,7 +14,7 @@ class ShowCartService {
 
   public async execute({ id, request_id }: IShowCartDTO): Promise<Cart> {
     const cart = await this.cartRepository.findBy({
-      id: id,
+      id,
       user_id: request_id,
     });
 
@@ -33,9 +31,9 @@ class ShowCartService {
       (cartDate.getTime() - currentDate.getTime()) / 1000 / 60,
     );
 
-    //if (diffInMinutes > cart.) {
+    // if (diffInMinutes > cart.) {
     //  throw new AppError('Carrinho expirado', 400);
-    //}
+    // }
   }
 }
 

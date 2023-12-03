@@ -1,14 +1,15 @@
 import { AppError } from '@shared/error/AppError';
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { plainToInstance } from 'class-transformer';
 import { IProductRepository } from '@modules/Product/repositories/ProductRepository.interface';
 import { v4 } from 'uuid';
-import { Product } from '@modules/Product/entities/Product';
+import { Product } from '@modules/Product/models/Product';
 import { ICartRepository } from '../repositories/CartRepository.interface';
 import { IUpdateCartDTO } from './dto/UpdateCartDTO';
-import { Cart } from '../entities/Cart';
+import { Cart } from '../models/Cart';
 import { getDeliveryFee } from '../util/CartValues';
+import { GetCurrentCartService } from './GetCurrentCart.service';
 
 @injectable()
 class UpdateCartService {
@@ -20,6 +21,10 @@ class UpdateCartService {
 
     @inject('ProductRepository')
     private productRepository: IProductRepository,
+
+    private getCurrentCartService: GetCurrentCartService = container.resolve(
+      GetCurrentCartService,
+    ),
   ) {}
 
   public async execute({
@@ -28,12 +33,14 @@ class UpdateCartService {
     cart_items,
     ...cartParams
   }: IUpdateCartDTO): Promise<Cart> {
-    const cart = await this.cartRepository.findBy({
-      id,
-      user_id: request_id,
-    });
+    const cart = id
+      ? this.getCurrentCartService.execute({ request_id })
+      : await this.cartRepository.findBy({
+          id,
+          user_id: request_id,
+        });
 
-    if (!cart) throw new AppError('Usuário não encontrado', 404);
+    if (!cart) throw new AppError('Carrinho não encontrado', 404);
 
     // if (cart_items.length === 0) throw new AppError('Carrinho vazio', 400);
 
@@ -88,7 +95,6 @@ class UpdateCartService {
       cart_payment_cards: [],
       created_at: cart.created_at,
       updated_at: new Date(),
-      is_current: true,
     });
     return plainToInstance(Cart, uptated_cart);
   }

@@ -1,7 +1,7 @@
 import { Product } from '@prisma/client';
 import { IPaginatedRequest } from 'src/shared/interfaces/IPaginatedRequest';
 import { IPaginatedResponse } from 'src/shared/interfaces/IPaginatedResponse';
-import { Product as EntityProduct } from '../entities/Product';
+import { Product as EntityProduct } from '../models/Product';
 import { IProductCreate, IProductUpdate } from './dto/ProductRepositoryDTO';
 
 interface IProductRepository {

@@ -2,9 +2,10 @@ import { Cart, Cart_status } from '@prisma/client';
 import { prisma } from '@shared/database';
 import { IPaginatedRequest } from '@shared/interfaces/IPaginatedRequest';
 import { IPaginatedResponse } from '@shared/interfaces/IPaginatedResponse';
+import { prisma_cache_time } from '@config/prismaCacheTime';
 import { ICartCreate, ICartUpdate } from './dto/CartRepositoryDTO';
-import { ICartRepository } from './CartRepository.interface';
-import { Cart as EntityCart } from '../entities/Cart';
+import { ICartRepository, ICustomFilters } from './CartRepository.interface';
+import { Cart as EntityCart } from '../models/Cart';
 import {
   getDeliveryFee,
   getTotalDiscount,
@@ -46,17 +47,19 @@ class CartRepository implements ICartRepository {
     page,
     limit,
     filters,
-    customFilters: { start_date, end_date },
+    customFilters,
   }: // search,
-  IPaginatedRequest<Cart>): Promise<IPaginatedResponse<EntityCart>> {
+  IPaginatedRequest<Cart, ICustomFilters>): Promise<
+    IPaginatedResponse<EntityCart>
+  > {
     const carts = await prisma.cart.findMany({
       where: filters && {
         ...filters,
         updated_at:
-          start_date && end_date
+          customFilters?.start_date && customFilters?.end_date
             ? {
-                gte: start_date,
-                lte: end_date,
+                gte: customFilters?.start_date,
+                lte: customFilters?.end_date,
               }
             : undefined,
         // name: {
@@ -87,6 +90,7 @@ class CartRepository implements ICartRepository {
       },
       skip: page && limit ? (page - 1) * limit : undefined,
       take: limit,
+      cacheStrategy: { ...prisma_cache_time },
     });
 
     const cartTotal = await prisma.cart.count({
@@ -202,8 +206,6 @@ class CartRepository implements ICartRepository {
               create: datas.cart_coupons,
             }
           : undefined,
-
-        is_current: datas.is_current,
       },
     });
     console.log('updatedCart', updatedCart);

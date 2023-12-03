@@ -1,7 +1,7 @@
-import { Product } from '@modules/Product/entities/Product';
+import { Product } from '@modules/Product/models/Product';
 import { Cart_status, Coupon } from '@prisma/client';
-import { Cart } from '../entities/Cart';
-import { Cart_items } from '../entities/Cart_items';
+import { Cart } from '../models/Cart';
+import { Cart_items } from '../models/Cart_items';
 
 interface ICartItemsQuantity {
   product: Product;

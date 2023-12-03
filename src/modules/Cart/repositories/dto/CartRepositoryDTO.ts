@@ -1,6 +1,6 @@
-import { Cart_items } from '@modules/Cart/entities/Cart_items';
-import { PaymentCard } from '@modules/PaymentCard/entities/PaymentCard';
-import { Product } from '@modules/Product/entities/Product';
+import { Cart_items } from '@modules/Cart/models/Cart_items';
+import { PaymentCard } from '@modules/PaymentCard/models/PaymentCard';
+import { Product } from '@modules/Product/models/Product';
 import {
   CartCoupon,
   CartItems,
@@ -13,7 +13,6 @@ export interface ICartCreate {
   cart_items: { product: Product; quantity: number }[];
   expires_at?: Date;
   status?: Cart_status;
-  is_current?: boolean;
 }
 
 export interface ICartUpdate {
@@ -29,5 +28,4 @@ export interface ICartUpdate {
   status: Cart_status;
   created_at: Date;
   updated_at: Date;
-  is_current: boolean;
 }

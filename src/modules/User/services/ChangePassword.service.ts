@@ -7,7 +7,7 @@ import { plainToInstance } from 'class-transformer';
 import { UserRole } from '@prisma/client';
 import { IUserRepository } from '../repositories/UserRepository.interface';
 import { IChangePasswordDTO } from './dto/ChangePasswordDTO';
-import { User } from '../entities/User';
+import { User } from '../models/User';
 
 @injectable()
 class ChangePasswordService {

@@ -3,8 +3,8 @@ import { Cart_status } from '@prisma/client';
 import { AppError } from '@shared/error/AppError';
 import { plainToInstance } from 'class-transformer';
 import { inject, injectable } from 'tsyringe';
-import { Cart } from '../entities/Cart';
-import { Cart_items } from '../entities/Cart_items';
+import { Cart } from '../models/Cart';
+import { Cart_items } from '../models/Cart_items';
 import { ICartRepository } from '../repositories/CartRepository.interface';
 import { ICreateExchangeItemsDTO } from './dto/ICreateExchangeItemsDTO';
 

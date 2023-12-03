@@ -5,7 +5,7 @@ import { IHashProvider } from '@shared/container/providers/HashProvider/model/IH
 import { plainToInstance } from 'class-transformer';
 import { IAddressRepository } from '../repositories/AddressRepository.interface';
 import { ICreateAddressDTO } from './dto/CreateAddressDTO';
-import { Address } from '../entities/Address';
+import { Address } from '../models/Address';
 
 @injectable()
 class CreateAddressService {

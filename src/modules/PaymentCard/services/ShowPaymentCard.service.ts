@@ -1,11 +1,9 @@
-
 import { AppError } from '@shared/error/AppError';
 import { plainToInstance } from 'class-transformer';
 import { inject, injectable } from 'tsyringe';
-import { PaymentCard } from '../entities/PaymentCard';
+import { PaymentCard } from '../models/PaymentCard';
 import { IPaymentCardRepository } from '../repositories/PaymentCardRepository.interface';
 import { IShowPaymentCardDTO } from './dto/ShowPaymentCardDTO';
-
 
 @injectable()
 class ShowPaymentCardService {
@@ -14,9 +12,12 @@ class ShowPaymentCardService {
     private paymentCardRepository: IPaymentCardRepository,
   ) {}
 
-  public async execute({ id, request_id }: IShowPaymentCardDTO): Promise<PaymentCard> {
+  public async execute({
+    id,
+    request_id,
+  }: IShowPaymentCardDTO): Promise<PaymentCard> {
     const paymentCard = await this.paymentCardRepository.findBy({
-      id: id,
+      id,
       user_id: request_id,
     });
 

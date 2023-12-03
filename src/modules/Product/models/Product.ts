@@ -1,5 +1,5 @@
 import { Product as IProduct, Category } from '@prisma/client';
-import { Cart_items } from '@modules/Cart/entities/Cart_items';
+import { Cart_items } from '@modules/Cart/models/Cart_items';
 
 class Product implements IProduct {
   id: string;

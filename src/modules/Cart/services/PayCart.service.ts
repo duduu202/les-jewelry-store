@@ -13,12 +13,12 @@ import {
 } from '@prisma/client';
 import { ICouponRepository } from '@modules/Coupon/repositories/CouponRepository.interface';
 import { IPaymentCardRepository } from '@modules/PaymentCard/repositories/PaymentCardRepository.interface';
-import { Product } from '@modules/Product/entities/Product';
-import { PaymentCard } from '@modules/PaymentCard/entities/PaymentCard';
+import { Product } from '@modules/Product/models/Product';
+import { PaymentCard } from '@modules/PaymentCard/models/PaymentCard';
 import { IAddressRepository } from '@modules/Address/repositories/AddressRepository.interface';
 import { v4 } from 'uuid';
 import { IPayCartDTO } from './dto/PayCartDTO copy';
-import { Cart } from '../entities/Cart';
+import { Cart } from '../models/Cart';
 import { ICartRepository } from '../repositories/CartRepository.interface';
 
 interface IConfirmPayment {
@@ -137,9 +137,9 @@ class PayCartService {
     const total =
       datas.total_value + datas.total_value * this.freight_value_percentage;
     let beyond = false;
-     if(!datas.coupons || datas.coupons.lenght <= 0){
-    return;
-}
+    if (!datas.coupons || datas.coupons.lenght <= 0) {
+      return;
+    }
 
     datas.coupons?.forEach(coup => {
       total_discount += coup.discount;
@@ -163,10 +163,10 @@ class PayCartService {
       throw new AppError('Carrinho expirado', 400);
     }
     if (cart.paid_status == Paid_status.PAID) {
-      if (cart.is_current) {
-        cart.is_current = false;
-        await this.cartRepository.update(cart);
-      }
+      // if (cart.is_current) {
+      //   cart.is_current = false;
+      //   await this.cartRepository.update(cart);
+      // }
       throw new AppError('Carrinho já pago', 400);
     }
     if (cart.paid_status == Paid_status.REFUNDED) {
@@ -337,7 +337,6 @@ class PayCartService {
       updated_at: datas.cart.updated_at,
       cart_items: datas.cart.cart_items,
       cart_payment_cards: datas.cart.cart_payment_cards,
-      is_current: false,
     });
 
     await this.generateCouponWhenNegative(datas);

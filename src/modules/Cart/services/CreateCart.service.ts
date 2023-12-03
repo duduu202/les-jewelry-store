@@ -6,7 +6,7 @@ import { plainToInstance } from 'class-transformer';
 import { IProductRepository } from '@modules/Product/repositories/ProductRepository.interface';
 import { ICartRepository } from '../repositories/CartRepository.interface';
 import { ICreateCartDTO } from './dto/CreateCartDTO';
-import { Cart } from '../entities/Cart';
+import { Cart } from '../models/Cart';
 
 @injectable()
 class CreateCartService {
@@ -48,7 +48,6 @@ class CreateCartService {
         quantity: item.quantity,
       })),
       expires_at: new Date(Date.now() + this.time_available_in_minutes * 60000),
-      is_current: true,
     });
 
     return plainToInstance(Cart, cart);

@@ -5,19 +5,20 @@ import { IHashProvider } from '@shared/container/providers/HashProvider/model/IH
 import { plainToInstance } from 'class-transformer';
 import { IPaymentCardRepository } from '../repositories/PaymentCardRepository.interface';
 import { ICreatePaymentCardDTO } from './dto/CreatePaymentCardDTO';
-import { PaymentCard } from '../entities/PaymentCard';
+import { PaymentCard } from '../models/PaymentCard';
 
 @injectable()
 class CreatePaymentCardService {
   constructor(
     @inject('PaymentCardRepository')
     private paymentCardRepository: IPaymentCardRepository,
-    
   ) {}
 
-  public async execute({ ...paymentCardParams }: ICreatePaymentCardDTO): Promise<PaymentCard> {
-    const { request_id, ...restParams} = paymentCardParams;
-    
+  public async execute({
+    ...paymentCardParams
+  }: ICreatePaymentCardDTO): Promise<PaymentCard> {
+    const { request_id, ...restParams } = paymentCardParams;
+
     const paymentCard = await this.paymentCardRepository.create({
       user_id: paymentCardParams.request_id,
       ...restParams,

@@ -1,10 +1,10 @@
 import { Cart } from '@prisma/client';
 import { IPaginatedRequest } from 'src/shared/interfaces/IPaginatedRequest';
 import { IPaginatedResponse } from 'src/shared/interfaces/IPaginatedResponse';
-import { Cart as EntityCart } from '../entities/Cart';
+import { Cart as EntityCart } from '../models/Cart';
 import { ICartCreate, ICartUpdate } from './dto/CartRepositoryDTO';
 
-interface ICustomFilters {
+export interface ICustomFilters {
   start_date?: Date;
   end_date?: Date;
   categories?: string[];

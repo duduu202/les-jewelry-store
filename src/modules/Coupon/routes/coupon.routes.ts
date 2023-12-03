@@ -15,4 +15,8 @@ couponRouter.get('/', listCouponMiddleware, couponController.index);
 
 couponRouter.get('/:id', showCouponMiddleware, couponController.show);
 
+couponRouter.put('/:id', couponController.update);
+
+couponRouter.post('/', couponController.create);
+
 export { couponRouter };

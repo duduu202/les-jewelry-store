@@ -2,7 +2,7 @@ interface IPaginatedResponse<T> {
   results: T[];
   total: number;
   page: number;
-  limit: number;
+  limit?: number;
 }
 
 export { IPaginatedResponse };

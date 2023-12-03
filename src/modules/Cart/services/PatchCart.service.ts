@@ -5,7 +5,7 @@ import { inject, injectable } from 'tsyringe';
 import { IUserRepository } from '@modules/User/repositories/UserRepository.interface';
 import { Cart_status, Coupon_type, Paid_status } from '@prisma/client';
 import { ICouponRepository } from '@modules/Coupon/repositories/CouponRepository.interface';
-import { Cart } from '../entities/Cart';
+import { Cart } from '../models/Cart';
 import { ICartRepository } from '../repositories/CartRepository.interface';
 import { IPatchCartDTO } from './dto/PatchCartDTO';
 

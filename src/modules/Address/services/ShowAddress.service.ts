@@ -1,11 +1,9 @@
-
 import { AppError } from '@shared/error/AppError';
 import { plainToInstance } from 'class-transformer';
 import { inject, injectable } from 'tsyringe';
-import { Address } from '../entities/Address';
+import { Address } from '../models/Address';
 import { IAddressRepository } from '../repositories/AddressRepository.interface';
 import { IShowAddressDTO } from './dto/ShowAddressDTO';
-
 
 @injectable()
 class ShowAddressService {
@@ -16,7 +14,7 @@ class ShowAddressService {
 
   public async execute({ id, request_id }: IShowAddressDTO): Promise<Address> {
     const address = await this.addressRepository.findBy({
-      id: id,
+      id,
       user_id: request_id,
     });
 

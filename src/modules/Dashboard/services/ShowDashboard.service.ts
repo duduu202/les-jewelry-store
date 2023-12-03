@@ -1,11 +1,11 @@
-import { Cart } from '@modules/Cart/entities/Cart';
+import { Cart } from '@modules/Cart/models/Cart';
 import { ICartRepository } from '@modules/Cart/repositories/CartRepository.interface';
-import { Product } from '@modules/Product/entities/Product';
+import { Product } from '@modules/Product/models/Product';
 import { IProductRepository } from '@modules/Product/repositories/ProductRepository.interface';
 import { Paid_status } from '@prisma/client';
 import { inject, injectable } from 'tsyringe';
-import { IDashboard, IData, IGroupData } from '../entities/Dashboard';
-import { IShowDashboardDTO } from './dto/ShowDashboardDTO';
+import { IDashboard, IData, IGroupData } from '../models/Dashboard';
+import { IGroupDTO, IShowDashboardDTO } from './dto/ShowDashboardDTO';
 
 interface IProductOrder extends Product {
   order_date: Date;
@@ -24,7 +24,7 @@ class ShowDashboardService {
   public async execute({
     start_date,
     end_date,
-    categories,
+    compareGroups,
     division_split = 12,
   }: IShowDashboardDTO): Promise<IDashboard> {
     const orders = await this.cartRepository.listBy({
@@ -48,7 +48,7 @@ class ShowDashboardService {
 
     const products = this.getProducts(orders.results);
 
-    const groups = this.manyGroupBy(products, categories);
+    const groups = this.manyGroupBy(products, compareGroups);
 
     const totalDiffInterval = end_date.getTime() - start_date.getTime();
 
@@ -97,27 +97,32 @@ class ShowDashboardService {
         } as IProductOrder;
       });
       return [...acc, ...products];
-    }, []) as Product[];
+    }, [] as IProductOrder[]);
 
     return allProducts;
   }
 
   manyGroupBy(
     products: IProductOrder[],
-    categories: string[],
+    compareGroups: IGroupDTO[],
   ): {
-    category: string;
+    categories: string[];
     products: IProductOrder[];
   }[] {
-    const groups = categories.map(category => {
+    const groups = compareGroups.map(grp => {
       const group = products.filter(product => {
-        const hasCategory = product.categories?.find(
-          cat => cat.name === category,
-        );
+        const hasCategory = grp.categories.map(cat => {
+          const has = product.categories?.find(c => c.name === cat);
+          return !!has;
+        });
+
+        // const hasCategory = product.categories?.find(
+        //   cat => cat.name === grp.categories
+        // );
         return hasCategory;
       });
       return {
-        category,
+        categories: grp.categories,
         products: group,
       };
     });

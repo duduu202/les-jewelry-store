@@ -3,10 +3,10 @@ import { inject, injectable } from 'tsyringe';
 import { AppError } from '@shared/error/AppError';
 import { IHashProvider } from '@shared/container/providers/HashProvider/model/IHashProvider';
 import { plainToInstance } from 'class-transformer';
+import { IStorageProvider } from '@shared/container/providers/StorageProvider/models/IStorageProvider';
 import { IUserRepository } from '../repositories/UserRepository.interface';
 import { ICreateUserDTO } from './dto/CreateUserDTO';
-import { User } from '../entities/User';
-import { IStorageProvider } from '@shared/container/providers/StorageProvider/models/IStorageProvider';
+import { User } from '../models/User';
 
 @injectable()
 class CreateUserService {

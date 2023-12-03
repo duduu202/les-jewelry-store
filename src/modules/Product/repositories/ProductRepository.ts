@@ -1,11 +1,12 @@
-import { Product, Paid_status } from '@prisma/client';
+import { Product, Paid_status } from '@prisma/client/edge';
 import { prisma } from '@shared/database';
 import { IPaginatedRequest } from '@shared/interfaces/IPaginatedRequest';
 import { IPaginatedResponse } from '@shared/interfaces/IPaginatedResponse';
-import { Cart } from '@modules/Cart/entities/Cart';
+import { Cart } from '@modules/Cart/models/Cart';
+import { prisma_cache_time } from '@config/prismaCacheTime';
 import { IProductCreate, IProductUpdate } from './dto/ProductRepositoryDTO';
 import { IProductRepository } from './ProductRepository.interface';
-import { Product as EntityProduct } from '../entities/Product';
+import { Product as EntityProduct } from '../models/Product';
 
 class ProductRepository implements IProductRepository {
   async findBy(
@@ -25,6 +26,7 @@ class ProductRepository implements IProductRepository {
           },
         },
       },
+      cacheStrategy: { ttl: 60, swr: 30 },
     });
 
     const countNotPaid = productsFil.reduce((acc, prd) => {
@@ -65,6 +67,9 @@ class ProductRepository implements IProductRepository {
       },
       skip: page && limit ? (page - 1) * limit : undefined,
       take: limit,
+      cacheStrategy: {
+        swr: prisma_cache_time.swr,
+      },
     });
 
     const productTotal = prisma.product.count({
@@ -74,6 +79,9 @@ class ProductRepository implements IProductRepository {
           contains: search,
           mode: 'insensitive',
         },
+      },
+      cacheStrategy: {
+        swr: prisma_cache_time.swr,
       },
     });
 

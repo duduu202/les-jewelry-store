@@ -4,7 +4,7 @@ import { inject, injectable } from 'tsyringe';
 import { plainToInstance } from 'class-transformer';
 import { IAddressRepository } from '../repositories/AddressRepository.interface';
 import { IUpdateAddressDTO } from './dto/UpdateAddressDTO';
-import { Address } from '../entities/Address';
+import { Address } from '../models/Address';
 
 @injectable()
 class UpdateAddressService {

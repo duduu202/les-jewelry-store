@@ -1,7 +1,7 @@
 import { Exclude } from 'class-transformer';
 import { CartItems as ICart_items, Paid_status } from '@prisma/client';
-import { PaymentCard } from '@modules/PaymentCard/entities/PaymentCard';
-import { Product } from '@modules/Product/entities/Product';
+import { PaymentCard } from '@modules/PaymentCard/models/PaymentCard';
+import { Product } from '@modules/Product/models/Product';
 
 class Cart_items implements ICart_items {
   id: string;
