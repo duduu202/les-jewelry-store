@@ -19,6 +19,8 @@ couponRouter.get('/:id', showCouponMiddleware, couponController.show);
 
 couponRouter.put('/:id', updateCouponMiddleware, couponController.update);
 
+couponRouter.delete('/:id', showCouponMiddleware, couponController.delete);
+
 couponRouter.post('/', createCouponMiddleware, couponController.create);
 
 export { couponRouter };

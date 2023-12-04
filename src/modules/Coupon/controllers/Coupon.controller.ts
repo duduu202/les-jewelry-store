@@ -6,6 +6,7 @@ import { CreateCouponService } from '../services/CreateCoupon.service';
 import { ListCouponService } from '../services/ListCoupon.service';
 import { ShowCouponService } from '../services/ShowCoupon.service';
 import { UpdateCouponService } from '../services/UpdateCoupon.service';
+import { DeleteCouponService } from '../services/DeleteCoupon.service';
 
 class CouponController {
   async show(req: Request, res: Response): Promise<Response> {
@@ -15,6 +16,20 @@ class CouponController {
     const showCouponService = container.resolve(ShowCouponService);
 
     const coupon = await showCouponService.execute({
+      id,
+      request_id: user.role === UserRole.Master ? undefined : user.id,
+    });
+
+    return res.json(coupon);
+  }
+
+  async delete(req: Request, res: Response): Promise<Response> {
+    const { id } = req.params;
+    const { user } = req;
+
+    const deleteCouponService = container.resolve(DeleteCouponService);
+
+    const coupon = await deleteCouponService.execute({
       id,
       request_id: user.role === UserRole.Master ? undefined : user.id,
     });
