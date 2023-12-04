@@ -39,6 +39,10 @@ class UpdateProductService {
 
     Object.assign(product, productParams);
 
+    if (categories) {
+      product.categories = [];
+    }
+
     const newProduct = await this.productRepository.update({
       description: product.description,
       id: product.id,

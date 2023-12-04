@@ -15,6 +15,9 @@ class ProductRepository implements IProductRepository {
   ): Promise<EntityProduct | null> {
     const product = (await prisma.product.findFirst({
       where: { ...filter },
+      include: {
+        categories: true,
+      },
     })) as EntityProduct;
     if (!product) return null;
 
@@ -145,6 +148,21 @@ class ProductRepository implements IProductRepository {
   }
 
   async update({ id, categories, ...datas }: IProductUpdate): Promise<Product> {
+    const product = await this.findBy({ id });
+    // disconnect all categories
+    if (categories && product && product.categories) {
+      await prisma.product.update({
+        where: { id },
+        data: {
+          categories: {
+            disconnect: product.categories.map(category => ({
+              name: category.name,
+            })),
+          },
+        },
+      });
+    }
+
     const updatedProduct = await prisma.product.update({
       where: { id },
       data: {
