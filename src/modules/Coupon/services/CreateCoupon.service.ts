@@ -14,14 +14,17 @@ class CreateCouponService {
   public async execute({
     code,
     discount,
+    quantity,
   }: {
     code: string;
     discount: number;
+    quantity: number;
   }): Promise<Coupon> {
     return this.couponRepository.create({
       code,
       discount,
       type: Coupon_type.discount,
+      quantity,
     });
   }
 }

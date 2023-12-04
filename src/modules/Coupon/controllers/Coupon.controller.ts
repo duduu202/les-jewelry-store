@@ -1,3 +1,4 @@
+import { UserRole } from '@prisma/client';
 import { instanceToInstance } from 'class-transformer';
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
@@ -15,7 +16,7 @@ class CouponController {
 
     const coupon = await showCouponService.execute({
       id,
-      request_id: user.id,
+      request_id: user.role === UserRole.Master ? undefined : user.id,
     });
 
     return res.json(coupon);
@@ -40,27 +41,29 @@ class CouponController {
   }
 
   async create(req: Request, res: Response): Promise<Response> {
-    const { code, discount } = req.body;
+    const { code, discount, quantity } = req.body;
 
     const createCouponService = container.resolve(CreateCouponService);
 
     const coupon = await createCouponService.execute({
       code,
-      discount,
+      discount: Number(discount),
+      quantity: Number(quantity),
     });
 
     return res.status(201).json(instanceToInstance(coupon));
   }
 
   async update(req: Request, res: Response): Promise<Response> {
-    const { code, discount } = req.body;
+    const { code, discount, quantity } = req.body;
 
     const updateCouponService = container.resolve(UpdateCouponService);
 
     const coupon = await updateCouponService.execute({
       id: req.params.id,
       code,
-      discount,
+      discount: Number(discount),
+      quantity: Number(quantity),
     });
 
     return res.status(201).json(instanceToInstance(coupon));

@@ -2,8 +2,10 @@ import { Router } from 'express';
 import { verifyToken } from '@shared/middleware/verifyToken';
 import { CouponController } from '../controllers/Coupon.controller';
 import {
+  createCouponMiddleware,
   listCouponMiddleware,
   showCouponMiddleware,
+  updateCouponMiddleware,
 } from './validators/coupon.validation';
 
 const couponRouter = Router();
@@ -15,8 +17,8 @@ couponRouter.get('/', listCouponMiddleware, couponController.index);
 
 couponRouter.get('/:id', showCouponMiddleware, couponController.show);
 
-couponRouter.put('/:id', couponController.update);
+couponRouter.put('/:id', updateCouponMiddleware, couponController.update);
 
-couponRouter.post('/', couponController.create);
+couponRouter.post('/', createCouponMiddleware, couponController.create);
 
 export { couponRouter };

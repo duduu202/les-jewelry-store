@@ -55,6 +55,7 @@ class CouponRepository implements ICouponRepository {
         expires_at: datas.expires_at,
         type,
         user_id: datas.user_id,
+        quantity: datas.quantity,
       },
     });
     return coupon;

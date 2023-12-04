@@ -13,3 +13,22 @@ export const showCouponMiddleware = celebrate({
     id: Joi.string().required(),
   },
 });
+
+export const createCouponMiddleware = celebrate({
+  [Segments.BODY]: {
+    code: Joi.string().required().min(3).label('código'),
+    discount: Joi.number().required().min(0).label('desconto'),
+    quantity: Joi.number().required().min(1).label('quantidade'),
+  },
+});
+
+export const updateCouponMiddleware = celebrate({
+  [Segments.PARAMS]: {
+    id: Joi.string().required(),
+  },
+  [Segments.BODY]: {
+    code: Joi.string().required().min(3).label('código'),
+    discount: Joi.number().required().min(0).label('desconto'),
+    quantity: Joi.number().required().min(1).label('quantidade'),
+  },
+});

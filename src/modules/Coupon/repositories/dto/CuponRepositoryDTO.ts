@@ -6,4 +6,5 @@ export interface ICouponCreate {
   expires_at?: Date;
   discount: number;
   type?: Coupon_type;
+  quantity: number;
 }

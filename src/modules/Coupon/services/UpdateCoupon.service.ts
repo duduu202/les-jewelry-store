@@ -15,10 +15,12 @@ class UpdateCouponService {
     id,
     code,
     discount,
+    quantity,
   }: {
     id: string;
     code?: string;
     discount?: number;
+    quantity?: number;
   }): Promise<Coupon> {
     let coupon = await this.couponRepository.findBy({
       id,
@@ -35,6 +37,7 @@ class UpdateCouponService {
     }
     if (code) coupon.code = code;
     if (discount) coupon.discount = discount;
+    if (quantity) coupon.quantity = quantity;
     await this.couponRepository.update(coupon);
 
     return coupon;

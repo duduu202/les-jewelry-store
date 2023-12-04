@@ -16,7 +16,7 @@ class ShowCouponService {
     request_id,
   }: {
     id: string;
-    request_id: string;
+    request_id?: string;
   }): Promise<Coupon> {
     let coupon = await this.couponRepository.findBy({
       id,
