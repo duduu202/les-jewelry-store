@@ -33,6 +33,7 @@ class ShowDashboardService {
     end_date,
     compareGroups,
     division_split = 12,
+    all_sales,
   }: IShowDashboardDTO): Promise<IDashboardGroup[]> {
     const orders = await this.cartRepository.listBy(
       {
@@ -64,6 +65,13 @@ class ShowDashboardService {
     const products = this.getProducts(orders.results);
 
     const groups = this.getAndGroups(products, compareGroups);
+
+    if (all_sales) {
+      groups.push({
+        categories: ['tudo'],
+        products,
+      });
+    }
 
     const interval =
       (end_date.getTime() - start_date.getTime()) / division_split;

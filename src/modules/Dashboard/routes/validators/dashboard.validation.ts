@@ -10,7 +10,8 @@ export const showDashboardMiddleware = celebrate({
           categories: Joi.array().items(Joi.string().required()).required(),
         }).required(),
       )
-      .required(),
+      .default([]),
     division_split: Joi.number(),
+    all_sales: Joi.boolean(),
   },
 });

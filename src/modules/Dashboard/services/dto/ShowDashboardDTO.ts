@@ -8,6 +8,7 @@ interface IShowDashboardDTO {
   /** each group of categories will be a line in the chart */
   compareGroups: IGroupDTO[];
   division_split?: number;
+  all_sales?: boolean;
 }
 
 export { IShowDashboardDTO, IGroupDTO };

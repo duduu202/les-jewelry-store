@@ -4,7 +4,8 @@ import { ShowDashboardService } from '../services/ShowDashboard.service';
 
 class DashboardController {
   async show(req: Request, res: Response): Promise<Response> {
-    const { start_date, end_date, groups, division_split } = req.query;
+    const { all_sales, start_date, end_date, groups, division_split } =
+      req.query;
 
     const showDashboardService = container.resolve(ShowDashboardService);
 
@@ -13,6 +14,7 @@ class DashboardController {
       end_date: new Date(end_date),
       compareGroups: groups,
       division_split: division_split ? Number(division_split) : undefined,
+      all_sales: all_sales ? Boolean(all_sales) : false,
     });
 
     return res.json(dashboard);
