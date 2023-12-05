@@ -8,6 +8,7 @@ import { IGroupDTO, IShowDashboardDTO } from './dto/ShowDashboardDTO';
 
 interface IProductOrder extends Product {
   order_date: Date;
+  sale_quantity: number;
 }
 
 interface IDashboardGroup {
@@ -90,18 +91,20 @@ class ShowDashboardService {
       return {
         categories: group.categories,
         datas: intervalDates.map(date => {
-          const filteredProducts = group.products.filter(product => {
+          const filteredProducts = group.products.reduce((acc, product) => {
             const isBetween =
               product.order_date.getTime() >= date.getTime() &&
               product.order_date.getTime() <=
                 date.getTime() + interval - 1 * 24 * 60 * 60 * 1000;
 
-            return isBetween;
-          });
-
+            if (isBetween) {
+              return acc + product.sale_quantity;
+            }
+            return acc;
+          }, 0);
           return {
             date,
-            quantity: filteredProducts.length,
+            quantity: filteredProducts,
           };
         }),
       };
@@ -115,11 +118,12 @@ class ShowDashboardService {
       const products = order.cart_items.map(item => {
         return {
           ...item.product,
-          order_date: order.created_at,
-        } as IProductOrder;
+          sale_quantity: item.quantity,
+          order_date: order.updated_at,
+        };
       });
       return [...acc, ...products];
-    }, [] as IProductOrder[]);
+    }, []);
 
     return allProducts;
   }
